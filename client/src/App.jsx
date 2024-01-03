@@ -6,7 +6,9 @@ import { Navbar } from "../Components/Navbar";
 import { Home } from "../Pages/Home";
 import { Board } from "../Pages/Board";
 import { Test } from "../Components/Test";
-
+import { RectCom } from "../Components/CanvasComponents/RectCom";
+import { Whiteboard } from "../Pages/Whiteboard";
+import { Tool } from "../Components/Tool";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -18,9 +20,12 @@ function App() {
   }, [loading]);
   return (
     <>
-      <Home />
-      {/* <Board /> */}
+      {/* <Tool /> */}
+      {/* <Home /> */}
+      <Board />
+      {/* <Whiteboard /> */}
       {/* <Test/> */}
+      {/* <RectCom /> */}
     </>
   );
 }

@@ -1,15 +1,14 @@
 import React, { useState } from "react";
-import { Rect, Circle } from "react-konva";
+import { Rect } from "react-konva";
 
-export const CircleCom = ({ lines, line, setShape, setLines }) => {
+export const RectCom = ({ lines, line, setShape, setLines }) => {
   return (
-    <Circle
+    <Rect
       key={line.id}
       x={line.points[0]}
       y={line.points[1]}
       width={100}
       height={100}
-      radius={50}
       draggable
       fill="red"
       onDragEnd={(e) => {

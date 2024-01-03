@@ -12,12 +12,10 @@ import { CompactPicker } from "react-color";
 // import "./App.scss";
 import { Test } from "../Components/Test";
 import { RectCom } from "../Components/CanvasComponents/RectCom";
-import { CircleCom } from "../Components/CanvasComponents/CircleCom";
-import { Customrec } from "../Components/CanvasComponents/Customshapes/CustomRec";
 import { Tool } from "../Components/Tool";
 
-export const Board = () => {
-  // const [texts, setTexts] = useState([]);
+export const Whiteboard = () => {
+  const [texts, setTexts] = useState([]);
 
   const [lines, setLines] = useState([]);
   const [color, setColor] = useState("#000000");
@@ -26,7 +24,7 @@ export const Board = () => {
   const [image, setImage] = useState(null);
   const [shape, setShape] = useState("");
   const [text, setText] = useState(null);
-  const [textPosition, setTextPosition] = useState({ x: 0, y: 0 });
+  const [textPosition, setTextPosition] = useState({ x: 50, y: 50 });
   const isDrawing = useRef(false);
   const canvas = useRef(null);
   const [rectanglePos, setRectanglePos] = useState({ x: 20, y: 50 });
@@ -46,8 +44,8 @@ export const Board = () => {
 
   const handleMouseDown = (event) => {
     isDrawing.current = true;
+    setText(false);
     const pos = event.target.getStage().getPointerPosition();
-    setTextPosition(pos);
 
     // Save the initial position for shapes
     if (shape !== "text") {
@@ -82,21 +80,6 @@ export const Board = () => {
           },
         ]);
       }
-    } else {
-      // Handle adding a new line for text
-      setLines([
-        ...lines,
-        {
-          id: lines.length,
-          points: [pos.x, pos.y], // Initial position for text
-          color,
-          brushSize,
-          isEraser,
-          shape,
-          image,
-          text,
-        },
-      ]);
     }
   };
 
@@ -107,7 +90,6 @@ export const Board = () => {
 
     const stage = event.target.getStage();
     const pointerPos = stage.getPointerPosition();
-    setTextPosition(pointerPos)
 
     const updatedLines = lines.map((line) => {
       if (line.id === lines.length - 1) {
@@ -162,14 +144,18 @@ export const Board = () => {
     setLines([]);
   };
 
-
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.onload = () => {
+      setImage(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
 
   const drawShape = (shapeType) => {
     setShape(shapeType);
-    if (shapeType == "text") {
-      console.log("text is");
-    }
-    setText(""); // Reset text when drawing shapes
+    // setText(""); // Reset text when drawing shapes
   };
 
   const handleTextChange = (event) => {
@@ -190,84 +176,19 @@ export const Board = () => {
           onChange={handleBrushSizeChange}
           min="1"
         />
+        <label>Upload Image:</label>
+        <input type="file" accept="image/*" onChange={handleImageUpload} />
       </div> */}
-
       <button onClick={toggleEraser}>
         {isEraser ? "Switch to Brush" : "Switch to Eraser"}
       </button>
+      <button onClick={handleClearCanvas}>Clear Canvas</button>
       <button onClick={() => drawShape("rectangle")}>Draw Rectangle</button>
       <button onClick={() => drawShape("circle")}>Draw Circle</button>
       <label>Text:</label>
-      <button onClick={handleClearCanvas}>Clear Canvas</button>
-      <button onClick={() => drawShape("text")}>Add Text</button>
-      <Tool
-        toggleEraser={toggleEraser}
-        drawShape={drawShape}
-        handleClearCanvas={handleClearCanvas}
-      />
-      <Stage
-        width={window.innerWidth}
-        height={window.innerHeight - 100}
-        onMouseDown={handleMouseDown}
-        onMousemove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        ref={canvas}
-      >
-        <Layer>
-          {lines.map((line) => {
-            if (line.shape === "rectangle") {
-              // console.log(line);
-              return (
-                <Customrec
-                  setShape={setShape}
-                  lines={lines}
-                  line={line}
-                  setLines={setLines}
-                />
-              );
-            } else if (line.shape === "circle") {
-              console.log("circle");
-              return (
-                <CircleCom
-                  setShape={setShape}
-                  lines={lines}
-                  line={line}
-                  setLines={setLines}
-                />
-              );
-            } else if (line.shape === "text") {
-              console.log("in text");
-              console.log(line);
-              console.log(line.points);
-
-              return (
-                <Test
-                  setShape={setShape}
-                  lines={lines}
-                  line={line}
-                  setLines={setLines}
-                />
-              );
-            } else {
-              console.log(textPosition);
-              return (
-                <Line
-                  key={line.id}
-                  points={line.points}
-                  stroke={line.isEraser ? "#ffffff" : line.color}
-                  strokeWidth={
-                    line.isEraser ? line.brushSize * 2 : line.brushSize
-                  }
-                  lineCap="round"
-                  globalCompositeOperation={
-                    line.isEraser ? "destination-out" : "source-over"
-                  }
-                />
-              );
-            }
-          })}
-        </Layer>
-      </Stage>
+      {/* <input type="text" value={text} onChange={handleTextChange} /> */}
+      <button onClick={() => setText(true)}>Add Text</button>
+      <Tool />
     </div>
   );
 };

@@ -1,34 +1,42 @@
 import React, { useState } from "react";
-import { Stage, Layer, Text } from "react-konva";
+import { render } from "react-dom";
+import { Stage, Layer, Group } from "react-konva";
+import { TextBox } from "./CanvasComponents/Text/TextBox";
 
-export const Test = () => {
-  const [isDragging, setIsDragging] = useState(false);
-  const [position, setPosition] = useState({ x: 50, y: 50 });
-
-  const handleDragStart = () => {
-    setIsDragging(true);
-  };
-
-  const handleDragEnd = (e) => {
-    setIsDragging(false);
-    setPosition({
-      x: e.target.x(),
-      y: e.target.y(),
-    });
-  };
-  const changeText = () => {
-    console.log("sfsds");
-  };
+export const Test = ({ setShape, lines, line, setLines }) => {
+  const [text, setDummpyText] = useState(
+    "Click to resize. Double click to edit."
+  );
+  const [width, setWidth] = useState(200);
+  const [height, setHeight] = useState(200);
+  const [selected, setSelected] = useState(false);
+  // const
   return (
-    <Text
-      text="Draggable Text"
-      x={position.x}
-      y={position.y}
-      draggable
-      // onClick={() => changeText()}
-      fill={isDragging ? "green" : "black"}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-    />
+    <Group>
+      <TextBox
+        x={line.points[0]}
+        y={line.points[1]}
+        text={text}
+        colour="#FFDAE1"
+        onTextChange={(value) => setDummpyText(value)}
+        width={width}
+        height={height}
+        selected={selected}
+        onTextResize={(newWidth, newHeight) => {
+          setWidth(newWidth);
+          setHeight(newHeight);
+        }}
+        onClick={() => {
+          setSelected(!selected);
+        }}
+        setShapeState={setShape}
+        lines={lines}
+        line={line}
+        setLines={setLines}
+        onTextClick={(newSelected) => {
+          setSelected(newSelected);
+        }}
+      />
+    </Group>
   );
 };
