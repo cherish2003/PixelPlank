@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Group, Rect } from "react-konva";
-import { EditableText } from "./EditableText";
 import { EditableTextInput } from "./EditableTextInput";
 import { ResizableText } from "./ResizableText";
 
@@ -20,6 +19,7 @@ export function TextBox({
   lines,
   line,
   setLines,
+  fontSize,
 }) {
   const RETURN_KEY = 13;
   const ESCAPE_KEY = 27;
@@ -64,7 +64,9 @@ export function TextBox({
         y={position.y}
         width={width}
         height={height}
+        colour={colour}
         value={text}
+        fontSize={fontSize}
         onChange={handleTextChange}
         onKeyDown={handleEscapeKeys}
       />
@@ -80,9 +82,11 @@ export function TextBox({
         onResize={onTextResize}
         setShapeState={setShapeState}
         text={text}
+        colour={colour}
         width={width}
         lines={lines}
         line={line}
+        fontSize={fontSize}
         setLines={setLines}
       />
     </Group>

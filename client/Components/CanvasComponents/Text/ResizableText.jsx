@@ -2,6 +2,7 @@ import React, { useRef, useEffect } from "react";
 import { Text, Transformer } from "react-konva";
 
 export function ResizableText({
+  colour,
   position,
   setPosition,
   text,
@@ -11,6 +12,7 @@ export function ResizableText({
   onClick,
   onDoubleClick,
   setShapeState,
+  fontSize,
   lines,
   line,
   setLines,
@@ -84,9 +86,9 @@ export function ResizableText({
         y={position.y}
         ref={textRef}
         text={text}
-        fill="black"
+        fill={colour}
         fontFamily="sans-serif"
-        fontSize={24}
+        fontSize={fontSize}
         perfectDrawEnabled={false}
         onTransform={handleResize}
         onClick={onClick}

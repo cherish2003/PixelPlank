@@ -1,6 +1,6 @@
 import { Rect } from "react-konva";
 
-export const Customrec = ({ lines, line, setShape, setLines }) => {
+export const RecCom = ({ lines, line, setLines }) => {
   return (
     <Rect
       key={line.id}
@@ -11,7 +11,6 @@ export const Customrec = ({ lines, line, setShape, setLines }) => {
       draggable
       fill="red"
       onDragEnd={(e) => {
-        // Update the position of the rectangle
         const newPoints = [...line.points];
         newPoints[0] = e.target.x();
         newPoints[1] = e.target.y();
@@ -23,7 +22,6 @@ export const Customrec = ({ lines, line, setShape, setLines }) => {
 
         setLines(updatedLines);
       }}
-      onMouseLeave={() => setShape("")}
     />
   );
 };

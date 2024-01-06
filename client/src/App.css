@@ -74,7 +74,7 @@ ul {
     overflow-x: hidden;
     overflow-y: hidden;
   }
-  li button::after {
+  /* li button::after {
     content: " ";
     display: block;
 
@@ -84,7 +84,7 @@ ul {
     background-color: #000;
 
     transition: width 0.4s;
-  }
+  } */
 
   li button:hover::after {
     width: 100%;

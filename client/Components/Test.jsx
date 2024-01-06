@@ -3,7 +3,7 @@ import { render } from "react-dom";
 import { Stage, Layer, Group } from "react-konva";
 import { TextBox } from "./CanvasComponents/Text/TextBox";
 
-export const Test = ({ setShape, lines, line, setLines }) => {
+export const Test = ({ setShape, lines, line, setLines, fontSize, color }) => {
   const [text, setDummpyText] = useState(
     "Click to resize. Double click to edit."
   );
@@ -14,10 +14,10 @@ export const Test = ({ setShape, lines, line, setLines }) => {
   return (
     <Group>
       <TextBox
-        x={line.points[0]}
-        y={line.points[1]}
+        x={285}
+        y={100}
         text={text}
-        colour="#FFDAE1"
+        colour={color}
         onTextChange={(value) => setDummpyText(value)}
         width={width}
         height={height}
@@ -29,6 +29,7 @@ export const Test = ({ setShape, lines, line, setLines }) => {
         onClick={() => {
           setSelected(!selected);
         }}
+        fontSize={fontSize}
         setShapeState={setShape}
         lines={lines}
         line={line}

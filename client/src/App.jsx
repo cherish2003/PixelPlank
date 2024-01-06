@@ -6,8 +6,6 @@ import { Navbar } from "../Components/Navbar";
 import { Home } from "../Pages/Home";
 import { Board } from "../Pages/Board";
 import { Test } from "../Components/Test";
-import { RectCom } from "../Components/CanvasComponents/RectCom";
-import { Whiteboard } from "../Pages/Whiteboard";
 import { Tool } from "../Components/Tool";
 
 function App() {
@@ -25,7 +23,6 @@ function App() {
       <Board />
       {/* <Whiteboard /> */}
       {/* <Test/> */}
-      {/* <RectCom /> */}
     </>
   );
 }
