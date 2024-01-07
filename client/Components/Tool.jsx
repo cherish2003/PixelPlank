@@ -133,10 +133,7 @@ export const Tool = ({
                           </fieldset>
                         ) : null}
                         {item.text ? (
-                          <fieldset
-                            className="Fieldset"
-                            style={{ marginTop: "10px" }}
-                          >
+                          <fieldset className="Fieldset">
                             <label className="Label" htmlFor="height">
                               Font Size
                             </label>
@@ -151,7 +148,10 @@ export const Tool = ({
                           </fieldset>
                         ) : null}
                         {item.shapes ? (
-                          <fieldset className="Fieldset">
+                          <fieldset
+                            className="Fieldset"
+                            style={{ marginTop: "5px" }}
+                          >
                             <RiRectangleLine
                               className={`Shape ${
                                 currShape == "rectangle" ? "ShapeScale" : ""
@@ -251,7 +251,6 @@ export const Tool = ({
                             </HoverCard.Root>
 
                             <FaPencilAlt
-                            // style={{width:"30px"}}
                               onClick={() => setCurrShape("pencil")}
                               className={`Shape ${
                                 currShape == "pencil" ? "ShapeScale" : ""

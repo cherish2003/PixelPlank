@@ -5,22 +5,22 @@ import {
   Line,
   Rect,
   Circle,
-  Image,
   Text as KonvaText,
 } from "react-konva";
 import { CompactPicker } from "react-color";
-// import "./App.scss";
 import { Test } from "../Components/Test";
 import { CircleCom } from "../Components/CanvasComponents/Shapes/CircleCom";
 import { RecCom } from "../Components/CanvasComponents/Shapes/RecCom";
 import { Tool } from "../Components/Tool";
 import { LineSegment } from "../Components/CanvasComponents/Shapes/LineSegment";
 import { ArrowCom } from "../Components/CanvasComponents/Shapes/Arrow";
+import { Userbar } from "../Components/Userbar";
+import { MenuBar } from "../Components/Menu/MenuBar";
 
 export const Board = () => {
-  // const [texts, setTexts] = useState([]);
-
   const [lines, setLines] = useState([]);
+  const [undoHistory, setUndoHistory] = useState([]);
+  const [redoHistory, setRedoHistory] = useState([]);
   const [color, setColor] = useState("#000000");
   const [brushSize, setBrushSize] = useState(5);
   const [isEraser, setIsEraser] = useState(false);
@@ -34,7 +34,11 @@ export const Board = () => {
   const isDrawing = useRef(false);
   const canvas = useRef(null);
 
-  // For Loading saved state from local storage
+  const updateUndoRedoHistory = () => {
+    setUndoHistory((prev) => [...prev, lines.slice()]);
+    setRedoHistory([]);
+  };
+
   useEffect(() => {
     const savedState = localStorage.getItem("drawingApp");
     if (savedState) {
@@ -42,21 +46,16 @@ export const Board = () => {
     }
   }, []);
 
-  // Save state to local storage whenever it changes
   useEffect(() => {
     localStorage.setItem("drawingApp", JSON.stringify(lines));
   }, [lines]);
-
-  console.log("shape :", shape);
 
   const handleMouseDown = (event) => {
     isDrawing.current = true;
     const pos = event.target.getStage().getPointerPosition();
     setTextPosition(pos);
 
-    // Save the initial position for shapes
     if (shape !== "text") {
-      // Handle adding a new line for rectangles or circles
       if (
         shape === "rectangle" ||
         shape === "circle" ||
@@ -67,7 +66,7 @@ export const Board = () => {
           ...lines,
           {
             id: lines.length,
-            points: [pos.x, pos.y, pos.x, pos.y], // Initial position for rectangles or circles
+            points: [pos.x, pos.y, pos.x, pos.y],
             color,
             brushSize,
             isEraser,
@@ -76,12 +75,11 @@ export const Board = () => {
           },
         ]);
       } else {
-        // For other shapes (freehand lines), use cubic Bezier interpolation
         setLines([
           ...lines,
           {
             id: lines.length,
-            points: [pos.x, pos.y], // Initial position for freehand lines
+            points: [pos.x, pos.y],
             color,
             brushSize,
             isEraser,
@@ -91,12 +89,11 @@ export const Board = () => {
         ]);
       }
     } else {
-      // Handle adding a new line for text
       setLines([
         ...lines,
         {
           id: lines.length,
-          points: [pos.x, pos.y], // Initial position for text
+          points: [pos.x, pos.y],
           color,
           brushSize,
           isEraser,
@@ -105,6 +102,8 @@ export const Board = () => {
         },
       ]);
     }
+
+    updateUndoRedoHistory();
   };
 
   const handleMouseMove = (event) => {
@@ -122,7 +121,6 @@ export const Board = () => {
           shape === "lineseg" ||
           shape === "arrow"
         ) {
-          // For rectangles and circles, use only two points
           const [startX, startY] = line.points.slice(0, 2);
           const [endX, endY] = [pointerPos.x, pointerPos.y];
 
@@ -131,8 +129,7 @@ export const Board = () => {
             points: [startX, startY, endX, endY],
           };
         } else {
-          // For other shapes (freehand lines), use cubic Bezier interpolation
-          const newPoints = line.points.slice(); // Copy existing points
+          const newPoints = line.points.slice();
           const [lastX, lastY] = newPoints.slice(-2);
           const [controlX, controlY] = [
             (lastX + pointerPos.x) / 2,
@@ -151,7 +148,7 @@ export const Board = () => {
 
     setLines(updatedLines);
   };
-  console.log(isDrawing.current);
+
   const handleMouseUp = () => {
     isDrawing.current = false;
   };
@@ -170,7 +167,9 @@ export const Board = () => {
 
   const handleClearCanvas = () => {
     setLines([]);
+    updateUndoRedoHistory();
   };
+
   const handleFontsize = (size) => {
     setFontSize(size);
   };
@@ -178,20 +177,47 @@ export const Board = () => {
   const drawShape = (shapeType) => {
     setShape(shapeType);
     setColor("#000000");
-
-    setText(""); // Reset text when drawing shapes
+    setText("");
+    updateUndoRedoHistory();
   };
 
   const handleTextChange = (event) => {
     setText(event.target.value);
   };
-  console.log(isEraser + "in board ");
+
+  const undo = () => {
+    if (undoHistory.length > 0) {
+      const previousState = undoHistory.pop();
+      setRedoHistory((prev) => [...prev, lines.slice()]);
+      setLines(previousState);
+    }
+  };
+
+  const redo = () => {
+    if (redoHistory.length > 0) {
+      const nextState = redoHistory.pop();
+      setUndoHistory((prev) => [...prev, lines.slice()]);
+      setLines(nextState);
+    }
+  };
+
+  const downloadImage = () => {
+    const dataUrl = canvas.current.toDataURL();
+    const link = document.createElement("a");
+    link.href = dataUrl;
+    link.download = "your_image_filename.jpeg"; 
+    link.click();
+  };
+
 
   return (
     <div className="App">
-      <button onClick={() => drawShape("linesegment")}>Add Text</button>
-      <button onClick={handleClearCanvas}>Clear Canvas</button>
-      
+      <MenuBar
+        undo={undo}
+        redo={redo}
+        clearAll={handleClearCanvas}
+        downloadImage={downloadImage}
+      />
       <Tool
         setShape={setShape}
         shape={shape}
@@ -263,7 +289,6 @@ export const Board = () => {
                 />
               );
             } else {
-              console.log(line);
               return (
                 <Line
                   key={line.id}

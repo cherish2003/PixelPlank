@@ -1,6 +1,6 @@
 import { Rect } from "react-konva";
 
-export const RecCom = ({ lines, line, setLines }) => {
+export const RecCom = ({ lines, line, setLines, setShape }) => {
   return (
     <Rect
       key={line.id}
