@@ -1,6 +1,177 @@
 @import "@radix-ui/colors/black-alpha.css";
 @import "@radix-ui/colors/mauve.css";
 @import "@radix-ui/colors/black-alpha.css";
+@import url("https://fonts.googleapis.com/css2?family=Varela+Round&display=swap");
+@import "@radix-ui/colors/black-alpha.css";
+@import "@radix-ui/colors/green.css";
+@import "@radix-ui/colors/mauve.css";
+@import "@radix-ui/colors/slate.css";
+@import "@radix-ui/colors/violet.css";
+
+/* reset */
+// button {
+//   all: unset;
+// }
+
+.ToastViewport {
+  --viewport-padding: 25px;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  padding: var(--viewport-padding);
+  gap: 10px;
+  width: 300px;
+  max-width: 100vw;
+  margin: 0;
+  list-style: none;
+  z-index: 2147483647;
+  outline: none;
+}
+
+.ToastRoot {
+  background-color: white;
+  border-radius: 6px;
+  box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
+    hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.ToastRoot[data-state="open"] {
+  animation: slideIn 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ToastRoot[data-state="closed"] {
+  animation: hide 100ms ease-in;
+}
+.ToastRoot[data-swipe="move"] {
+  transform: translateX(var(--radix-toast-swipe-move-x));
+}
+.ToastRoot[data-swipe="cancel"] {
+  transform: translateX(0);
+  transition: transform 200ms ease-out;
+}
+.ToastRoot[data-swipe="end"] {
+  animation: swipeOut 100ms ease-out;
+}
+
+@keyframes hide {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(calc(100% + var(--viewport-padding)));
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes swipeOut {
+  from {
+    transform: translateX(var(--radix-toast-swipe-end-x));
+  }
+  to {
+    transform: translateX(calc(100% + var(--viewport-padding)));
+  }
+}
+
+.ToastTitle {
+  grid-area: title;
+  font-weight: 500;
+  color: var(--slate-12);
+  font-size: 15px;
+}
+
+.ToastError {
+  color: red;
+}
+.ToastSuccess {
+  color: green;
+}
+
+// Toolbar css
+.toolBar {
+  position: absolute;
+  z-index: 10000;
+  bottom: 0;
+  width: 100%;
+  padding: 24px;
+  max-width: 580px;
+  margin: 0 auto;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.toolBar {
+  &-box {
+    display: flex;
+    padding: 8px;
+    background-color: #fff;
+    box-shadow: 0px 0px 16px 0px #4444;
+    border-radius: 8px;
+  }
+
+  &-container {
+    display: flex;
+    width: 100%;
+    list-style: none;
+    justify-content: space-evenly;
+  }
+
+  &__item {
+    display: flex;
+    position: relative;
+    padding: 2px;
+
+    &.active {
+      .toolBar__item-icon {
+        box-shadow: 0px 0px 16px 0px #4444;
+        margin-top: -45px;
+      }
+
+      .toolBar__item-text {
+        transform: scale(1);
+        display: flex;
+        justify-content: center;
+        font-size: bolder;
+        left: 50%;
+        right: 50%;
+      }
+    }
+
+    &-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6em;
+      background-color: #fff;
+      border-radius: 50%;
+      height: 46px;
+      width: 46px;
+      transition: margin-top 250ms ease-in-out, box-shadow 250ms ease-in-out;
+    }
+
+    &-text {
+      position: absolute;
+      bottom: 0;
+      transform: scale(0);
+      transition: transform 250ms ease-in-out;
+    }
+  }
+}
+
+// Hover menu, popover menu , slider etc
+// That are in toolbar css
 .HoverCardContent {
   border-radius: 6px;
   padding: 20px;
@@ -261,99 +432,5 @@
   to {
     opacity: 1;
     transform: translateX(0);
-  }
-}
-
-.App {
-  text-align: center;
-  /* margin-top: 20px; */
-  // background-color: #333;
-}
-
-h1 {
-  color: #333;
-}
-
-.controls {
-  margin-bottom: 20px;
-}
-
-.controls label {
-  margin-right: 10px;
-}
-
-.controls button {
-  margin-left: 10px;
-}
-@import url("https://fonts.googleapis.com/css2?family=Varela+Round&display=swap");
-
-nav {
-  position: absolute;
-  z-index: 10000;
-  bottom: 0;
-  width: 100%;
-  padding: 24px;
-  max-width: 580px;
-  margin: 0 auto;
-  left: 0;
-  right: 0;
-  bottom: 0;
-}
-
-.nav {
-  &-box {
-    display: flex;
-    padding: 8px;
-    background-color: #fff;
-    box-shadow: 0px 0px 16px 0px #4444;
-    border-radius: 8px;
-  }
-
-  &-container {
-    display: flex;
-    width: 100%;
-    list-style: none;
-    justify-content: space-evenly;
-  }
-
-  &__item {
-    display: flex;
-    position: relative;
-    padding: 2px;
-
-    &.active {
-      .nav__item-icon {
-        box-shadow: 0px 0px 16px 0px #4444;
-        margin-top: -45px;
-      }
-
-      .nav__item-text {
-        transform: scale(1);
-        display: flex;
-        justify-content: center;
-        font-size: bolder;
-        left: 50%;
-        right: 50%;
-      }
-    }
-
-    &-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.6em;
-      background-color: #fff;
-      border-radius: 50%;
-      height: 46px;
-      width: 46px;
-      transition: margin-top 250ms ease-in-out, box-shadow 250ms ease-in-out;
-    }
-
-    &-text {
-      position: absolute;
-      bottom: 0;
-      transform: scale(0);
-      transition: transform 250ms ease-in-out;
-    }
   }
 }

@@ -1,0 +1,48 @@
+import { useEffect } from "react";
+import * as Toast from "@radix-ui/react-toast";
+import { IoIosWarning } from "react-icons/io";
+import { FaCheckCircle } from "react-icons/fa";
+
+import "./App.scss";
+
+export const ResponseToast = ({ response, Open, setToast }) => {
+  //     return () => clearTimeout(timerRef.current);
+  //   }, []);
+  useEffect(() => {
+    setTimeout(() => {
+      setToast(false);
+    }, 3000);
+    console.log("called");
+  }, [Open]);
+
+  return (
+    <Toast.Provider swipeDirection="right">
+      <Toast.Root
+        className="ToastRoot"
+        open={Open}
+        onOpenChange={!Open}
+        duration={3000}
+      >
+        <Toast.Title
+          className={
+            response === "Login successfull"
+              ? "ToastTitle ToastSuccess"
+              : "ToastTitle ToastError"
+          }
+        >
+          {response === "Login successfull" ? (
+            <div className="flex justify-center items-center">
+              <FaCheckCircle size={20} className="mr-2" /> {response} !!
+            </div>
+          ) : (
+            <div className="flex justify-center items-center">
+              <IoIosWarning size={20} className="mr-2" />
+              {response} !!
+            </div>
+          )}
+        </Toast.Title>
+      </Toast.Root>
+      <Toast.Viewport className="ToastViewport" />
+    </Toast.Provider>
+  );
+};

@@ -4,5 +4,13 @@ import App from "./App.jsx";
 import { Theme } from "@radix-ui/themes";
 import "./index.css";
 import "@radix-ui/themes/styles.css";
+import UserProvider from "../Context/UserProvider.jsx";
+import { BrowserRouter } from "react-router-dom";
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <BrowserRouter>
+    <UserProvider>
+      <App />
+    </UserProvider>
+  </BrowserRouter>
+);

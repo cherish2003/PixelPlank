@@ -35,7 +35,7 @@ export const Navbar = ({ loginclick, signupclick }) => {
         {/* <div className="absolute h-32 w-full top-12 left-0 blur-xl bg-custom-grey "></div> */}
 
         <ul className="menu md:border-none flex justify-end list-reset m-0 w-full md:w-auto absolute top-[53px] left-0  sm:static glass">
-          <li className="border-t md:border-none  ">
+          <li className="border-t md:border-none navbarItem ">
             <button
               className="block md:inline-block px-1 py-3 no-underline text-grey-darkest text-grey-darker  ease-in dark:text-white dark:after:bg-white "
               onClick={() => loginclick()}
@@ -44,7 +44,7 @@ export const Navbar = ({ loginclick, signupclick }) => {
             </button>
           </li>
 
-          <li className="border-t md:border-none">
+          <li className="border-t md:border-none navbarItem">
             <button
               className="mid block md:inline-block px-1 py-3 no-underline text-grey-darkest hover:text-grey-darker ease-in-out dark:text-white dark:after:bg-white"
               onClick={() => signupclick()}
@@ -53,7 +53,7 @@ export const Navbar = ({ loginclick, signupclick }) => {
             </button>
           </li>
 
-          <li className="border-t md:border-none">
+          <li className="border-t md:border-none navbarItem">
             <button className="block md:inline-block px-1 py-3 no-underline text-grey-darkest hover:text-grey-darker rl ease-in-out dark:text-white dark:after:bg-white">
               Author
             </button>

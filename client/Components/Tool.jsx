@@ -41,7 +41,7 @@ export const Tool = ({
 
   const handleCLick = (item) => {
     item == "Eraser" ? toggleEraser(true) : toggleEraser(false),
-      item == "Text" ? drawShape("text") : null;
+    item == "Text" ? drawShape("text") : null;
   };
   const items = [
     {
@@ -72,13 +72,15 @@ export const Tool = ({
   ];
 
   return (
-    <nav>
-      <div class="nav-box">
-        <ul class="nav-container">
+    <nav className="toolBar">
+      <div class="toolBar-box">
+        <ul class="toolBar-container">
           {items.map((item, index) => (
             <li
               key={index}
-              className={`nav__item ${index === activeItem ? "active" : ""}`}
+              className={`toolBar__item ${
+                index === activeItem ? "active" : ""
+              }`}
               onClick={() => {
                 handleCLick(item.name);
                 setActiveItem(index);
@@ -87,7 +89,7 @@ export const Tool = ({
               <Popover.Root>
                 <Popover.Trigger>
                   <button
-                    className="nav__item-icon"
+                    className="toolBar__item-icon"
                     aria-label="Update dimensions"
                   >
                     {item.icon}
@@ -271,7 +273,7 @@ export const Tool = ({
                 </Popover.Portal>
               </Popover.Root>
 
-              <span class="nav__item-text">{item.name}</span>
+              <span class="toolBar__item-text">{item.name}</span>
             </li>
           ))}
         </ul>
