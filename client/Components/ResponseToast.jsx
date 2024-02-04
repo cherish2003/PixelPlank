@@ -14,7 +14,12 @@ export const ResponseToast = ({ response, Open, setToast }) => {
     }, 3000);
     console.log("called");
   }, [Open]);
-
+  const setSucess = (text) => {
+    if (text == "Login successful" || text == "Registration sucessful") {
+      return true;
+    }
+    return false;
+  };
   return (
     <Toast.Provider swipeDirection="right">
       <Toast.Root
@@ -25,12 +30,12 @@ export const ResponseToast = ({ response, Open, setToast }) => {
       >
         <Toast.Title
           className={
-            response === "Login successfull"
+            setSucess(response)
               ? "ToastTitle ToastSuccess"
               : "ToastTitle ToastError"
           }
         >
-          {response === "Login successfull" ? (
+          {setSucess(response) ? (
             <div className="flex justify-center items-center">
               <FaCheckCircle size={20} className="mr-2" /> {response} !!
             </div>

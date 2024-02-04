@@ -7,12 +7,15 @@ import React, {
 } from "react";
 import { motion } from "framer-motion";
 import { IoIosClose } from "react-icons/io";
-import { uploadimg } from "../public/uploadImg";
+// import { avatar } from "../public/avatar";
 import { loginApi, registerApi } from "../Api/userApi";
 import * as Toast from "@radix-ui/react-toast";
 import { ResponseToast } from "./ResponseToast";
 import { UserContext } from "../Context/UserProvider";
 import { getUserdata } from "../Api/userApi";
+
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export const BannerSec = forwardRef((props, ref) => {
   useImperativeHandle(ref, () => {
@@ -21,6 +24,7 @@ export const BannerSec = forwardRef((props, ref) => {
       Loginpage: LoginToggle,
     };
   });
+  const navigate = useNavigate();
 
   const [signinPage, setsigninPage] = useState(true);
   const [signinanimation, setsigninanimation] = useState(true);
@@ -34,7 +38,7 @@ export const BannerSec = forwardRef((props, ref) => {
   const [passHide, setPassHide] = useState(true);
   const [propic, setPropic] = useState(false);
   const [image, setImage] = useState(null);
-  const [uploadImg, setuploadImg] = useState(null);
+  const [avatar, setavatar] = useState(null);
 
   //Api response
   const [responsemessage, setResponsemessage] = useState(null);
@@ -47,12 +51,7 @@ export const BannerSec = forwardRef((props, ref) => {
     email: null,
     password: null,
   });
-  const { setUser, user } = useContext(UserContext);
-
-  useEffect(() => {
-    console.log(responsemessage);
-    console.log(user);
-  }, [responsemessage]);
+  const { user, setUser } = useContext(UserContext);
 
   const theme = "darks";
   const lightForm = "LightForm";
@@ -91,7 +90,7 @@ export const BannerSec = forwardRef((props, ref) => {
 
   const onImagechange = (e) => {
     setImage(URL.createObjectURL(e.target.files[0]));
-    setuploadImg(e.target.files[0]);
+    setavatar(e.target.files[0]);
     setPropic(true);
   };
   const ResfreshToken = async () => {
@@ -99,25 +98,44 @@ export const BannerSec = forwardRef((props, ref) => {
     console.log(res);
   };
 
-  const RegisterUser = async (postdata) => {
+  const RegisterUser = async (encoded64Image) => {
     try {
-      const headers = {
-        "Content-Type": "multipart/form-data",
-      };
-      const response = await registerApi.post("", postdata, { headers });
-      console.log(response);
+      const response = await registerApi.post("", {
+        email: registerValue.email,
+        password: registerValue.password,
+        username: registerValue.username,
+        avatar: encoded64Image,
+      });
+      setResponsemessage(response.data.message);
+      setToast(true);
     } catch (error) {
-      console.log(error);
+      setResponsemessage(error.response.data.message);
+      setToast(true);
     }
   };
   const handleRegisterSubmit = (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append("avatar", uploadImg); // avatarFile should be the actual File object
-    formData.append("username", registerValue.username);
-    formData.append("email", registerValue.email);
-    formData.append("password", registerValue.password);
-    RegisterUser(formData);
+    const fileLimit = 1024 * 1024 * 3;
+
+    if (avatar && avatar.size > fileLimit) {
+      setResponsemessage("Photo should within 3 mb");
+      setToast(true);
+      setPropic(false);
+    } else if (
+      !(registerValue.email && registerValue.password && registerValue.username)
+    ) {
+      setResponsemessage("All fields are required ");
+      setToast(true);
+      setPropic(false);
+    } else {
+      const imagereader = new FileReader();
+      imagereader.readAsDataURL(avatar);
+      console.log(avatar.size);
+      imagereader.onloadend = () => {
+        RegisterUser(imagereader.result);
+      };
+      console.log(imagereader);
+    }
   };
   const loginUser = async () => {
     try {
@@ -128,6 +146,7 @@ export const BannerSec = forwardRef((props, ref) => {
       setResponsemessage(response.data.message);
       setUser(response.data.user);
       setToast(true);
+      navigate(`/whiteboard/${user.username}`, { replace: true });
     } catch (error) {
       setResponsemessage(error.response.data.message);
       setToast(true);
@@ -307,7 +326,6 @@ export const BannerSec = forwardRef((props, ref) => {
                 </h2>
 
                 <form
-                  action=""
                   className="flex flex-col gap-4 "
                   onSubmit={(e) => {
                     handleRegisterSubmit(e);
@@ -413,7 +431,7 @@ export const BannerSec = forwardRef((props, ref) => {
                         class="flex  items-center justify-center h-20 w-60 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-white dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-slate-50 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
                       >
                         <div class="flex flex-col items-center justify-center pt-2">
-                          <img src={uploadimg} alt="" />
+                          <img src={avatar} alt="" />
                           <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
                             <span class="font-semibold">Click to upload</span>{" "}
                             or drag and drop
@@ -424,8 +442,10 @@ export const BannerSec = forwardRef((props, ref) => {
                         </div>
                         <input
                           id="dropzone-file"
+                          name="avatar"
                           type="file"
                           class="hidden"
+                          accept="image/*"
                           onChange={onImagechange}
                         />
                       </label>

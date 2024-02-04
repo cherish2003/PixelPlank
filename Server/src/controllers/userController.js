@@ -1,6 +1,7 @@
 import { user } from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import cloudinary from "../utils/cloudinary.js";
 
 const generateTokens = (data) => {
   const userId = data._id;
@@ -64,7 +65,7 @@ const loginUser = async (req, res) => {
       .cookie("accesstoken", accesstoken)
       .cookie("refreshtoken", refreshToken)
       .json({
-        message: "Login successfull",
+        message: "Login successful",
         user: existingUser,
       });
   } catch (error) {
@@ -73,44 +74,46 @@ const loginUser = async (req, res) => {
 };
 
 const registerUser = async (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, email, password, avatar } = req.body;
 
   console.log(username, email, password);
 
-  if (req.file) {
-    const avatarLocalPath = req.file.path;
-    console.log("Avatar local path:", avatarLocalPath);
+  try {
+    const existedUser = await user.findOne({
+      $or: [{ username }, { email }],
+    });
+    if (existedUser != null) {
+      if (existedUser.username == username) {
+        return res.status(409).json({
+          message: "Username already exists",
+        });
+      } else {
+        return res.status(409).json({
+          message: "Email already exists",
+        });
+      }
+    } else {
+      const uploadedresponse = await cloudinary.uploader.upload(avatar, {
+        public_id: `${username}`,
+      });
+      const usr = await user.create({
+        username,
+        email,
+        password,
+        avatar: uploadedresponse.url,
+      });
+      return res.status(200).json({
+        success: true,
+        message: "Registration sucessful",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
   }
-  // if (!(username && email && password && avatar)) {
-  //   res.status(422).json({ sucess: false, message: "All fields are required" });
-  // }
-  // try {
-  //   const existedUser = await user.find({
-  //     $or: [{ username, email }],
-  //   });
-  //   if (existedUser.length) {
-  //     return res.status(409).json({
-  //       message: "user with username or email already exists",
-  //     });
-  //   }
-  //   const usr = await user.create({
-  //     username,
-  //     email,
-  //     password,
-  //     avatar,
-  //   });
-  //   res.status(200).json({
-  //     success: true,
-
-  //     message: "Registration sucessfully",
-  //   });
-  // } catch (error) {
-  //   console.log(error);
-  //   return res.status(500).json({
-  //     success: false,
-  //     message: "Internal Server Error",
-  //   });
-  // }
 };
 
 const getUserData = async (req, res) => {
@@ -129,7 +132,6 @@ const getUserData = async (req, res) => {
 
 const getRefreshToken = async (req, res) => {
   const refreshtoken = req.cookies.refreshtoken;
-  console.log(refreshtoken);
   let userFromToken;
   const verRefresh = jwt.verify(
     refreshtoken,

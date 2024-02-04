@@ -8,16 +8,38 @@ import { Board } from "../Pages/Board";
 import { Test } from "../Components/Test";
 import { Tool } from "../Components/Tool";
 import Cookies from "js-cookie";
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useNavigate,
+  Navigate,
+} from "react-router-dom";
 import { tokenApi } from "../Api/userApi";
 import { useCookies } from "react-cookie";
+import { UserContext } from "../Context/UserProvider";
+import { useContext } from "react";
 
 function App() {
   const navigate = useNavigate();
+  const { user } = useContext(UserContext);
+  console.log(user);
 
   const [loading, setLoading] = useState(true);
   const [data, setdata] = useState();
   const [Cookies] = useCookies(["accesstoken"]);
+  const getRoomFromURL = () => {
+    const pathSegments = window.location.pathname.split("/");
+    return pathSegments[2];
+  };
+
+  useEffect(() => {
+    const url = getRoomFromURL();
+    console.log(url);
+    if (url && window.location.pathname === "/") {
+      navigate(`/whiteboard/${url}`, { replace: true });
+    }
+  }, [navigate]);
 
   useEffect(() => {
     const getAccessToken = async () => {
@@ -32,18 +54,17 @@ function App() {
     };
     getAccessToken();
   }, [Cookies.accesstoken]);
-  console.log(data);
 
-  useEffect(() => {
-    if (data) {
-      const { logout } = data;
-      if (!logout) {
-        navigate("/whiteboard", { replace: true });
-      } else {
-        navigate("/", { replace: true });
-      }
-    }
-  }, [data]);
+  // useEffect(() => {
+  //   if (data) {
+  //     const { logout } = data;
+  //     console.log(logout);
+  //     if (logout) {
+  //       navigate("/", { replace: true });
+  //     }
+  //   }
+  // }, [data]);
+
   useEffect(() => {
     loading
       ? document.querySelector("body").classList.add("loading")
@@ -53,7 +74,7 @@ function App() {
     <>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/whiteboard" element={<Board />} />
+        <Route path="/whiteboard/:username" element={<Board />} />
       </Routes>
     </>
   );

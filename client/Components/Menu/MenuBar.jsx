@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import * as Toolbar from "@radix-ui/react-toolbar";
 import * as Avatar from "@radix-ui/react-avatar";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
@@ -14,8 +14,16 @@ import { IoIosRedo } from "react-icons/io";
 import { MdDelete } from "react-icons/md";
 
 import "./index.scss";
+import { UserContext } from "../../Context/UserProvider";
 
-export const MenuBar = ({ undo, redo, clearAll, downloadImage }) => {
+export const MenuBar = ({ undo, redo, clearAll, downloadImage, socket }) => {
+  const getRoomFromURL = () => {
+    const pathSegments = window.location.pathname.split("/");
+    return pathSegments[2];
+  };
+  const x = getRoomFromURL();
+
+  const { user } = useContext(UserContext);
   const [bookmarksChecked, setBookmarksChecked] = React.useState(true);
   const [urlsChecked, setUrlsChecked] = React.useState(false);
   const [person, setPerson] = React.useState("pedro");
@@ -142,6 +150,14 @@ export const MenuBar = ({ undo, redo, clearAll, downloadImage }) => {
 
       <Toolbar.Separator className="ToolbarSeparator" />
       <Toolbar.Button className="ToolbarButton">Share</Toolbar.Button>
+      <Toolbar.Button
+        className="ToolbarButton"
+        onClick={() => {
+          socket.emit("join-Room", x);
+        }}
+      >
+        Join Room
+      </Toolbar.Button>
     </Toolbar.Root>
   );
 };

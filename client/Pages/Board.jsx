@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import {
   Stage,
   Layer,
@@ -16,8 +16,14 @@ import { LineSegment } from "../Components/CanvasComponents/Shapes/LineSegment";
 import { ArrowCom } from "../Components/CanvasComponents/Shapes/Arrow";
 import { Userbar } from "../Components/Userbar";
 import { MenuBar } from "../Components/Menu/MenuBar";
+import { UserContext } from "../Context/UserProvider";
+
+import { io } from "socket.io-client";
+
+const socket = io("http://localhost:4500");
 
 export const Board = () => {
+  const { user } = useContext(UserContext);
   const [lines, setLines] = useState([]);
   const [undoHistory, setUndoHistory] = useState([]);
   const [redoHistory, setRedoHistory] = useState([]);
@@ -33,11 +39,45 @@ export const Board = () => {
   const [textPosition, setTextPosition] = useState({ x: 0, y: 0 });
   const isDrawing = useRef(false);
   const canvas = useRef(null);
+  const getRoomFromURL = () => {
+    const pathSegments = window.location.pathname.split("/");
+    return pathSegments[2];
+  };
 
   const updateUndoRedoHistory = () => {
     setUndoHistory((prev) => [...prev, lines.slice()]);
     setRedoHistory([]);
   };
+  const owner = getRoomFromURL();
+  const emitDrawingEvent = (lines) => {
+    socket.emit("drawing", owner, lines);
+  };
+
+  useEffect(() => {
+    const roomFromURL = getRoomFromURL();
+    console.log(roomFromURL);
+    if (roomFromURL) {
+      socket.emit("join-Room", user.username || "Anonymous");
+    }
+
+    const handleDrawandClear = (data) => {
+      setLines(data);
+    };
+    // socket.on("users-list", (data) => {
+    //   console.log(data);
+    // });
+    socket.on("drawing", (data) => {
+      handleDrawandClear(data);
+    });
+
+    // socket.on("join-Room");
+    // socket.on("clearcanvas", handleDrawandClear);
+
+    // return () => {
+    //   socket.off("drawing", handleDrawandClear);
+    //   socket.off("clearcanvas", handleDrawandClear);
+    // };
+  }, [socket]);
 
   useEffect(() => {
     const savedState = localStorage.getItem("drawingApp");
@@ -46,9 +86,9 @@ export const Board = () => {
     }
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem("drawingApp", JSON.stringify(lines));
-  }, [lines]);
+  // useEffect(() => {
+  //   localStorage.setItem("drawingApp", JSON.stringify(lines));
+  // }, [lines]);
 
   const handleMouseDown = (event) => {
     isDrawing.current = true;
@@ -147,6 +187,7 @@ export const Board = () => {
     });
 
     setLines(updatedLines);
+    emitDrawingEvent(updatedLines);
   };
 
   const handleMouseUp = () => {
@@ -167,6 +208,7 @@ export const Board = () => {
 
   const handleClearCanvas = () => {
     setLines([]);
+    socket.emit("clearcanvas", []);
     updateUndoRedoHistory();
   };
 
@@ -205,10 +247,9 @@ export const Board = () => {
     const dataUrl = canvas.current.toDataURL();
     const link = document.createElement("a");
     link.href = dataUrl;
-    link.download = "your_image_filename.jpeg"; 
+    link.download = "your_image_filename.jpeg";
     link.click();
   };
-
 
   return (
     <div className="App">
@@ -217,6 +258,7 @@ export const Board = () => {
         redo={redo}
         clearAll={handleClearCanvas}
         downloadImage={downloadImage}
+        socket={socket}
       />
       <Tool
         setShape={setShape}
