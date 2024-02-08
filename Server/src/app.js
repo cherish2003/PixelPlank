@@ -28,29 +28,41 @@ const io = new Server(httpServer, {
   },
 });
 io.on("connection", (socket) => {
-  // console.log("A user connected");
-  // console.log(socket.id);
-  socket.on("join-Room", (roomName) => {
+  socket.on("join-Room", (roomName, username) => {
     if (!rooms[roomName]) {
       rooms[roomName] = { users: {} };
     }
     socket.join(roomName);
-    rooms[roomName].users[socket.id] = roomName;
-    io.to(roomName).emit("users-connected", roomName);
-    console.log(rooms);
-    socket.emit("users-list", Object.values(rooms[roomName].users));
+    console.log(roomName);
+    io.to(roomName).emit(
+      "users-list",
+      Object.entries(rooms[roomName].users).map(([id, name]) => ({ id, name }))
+    );
   });
   socket.on("drawing", (room, lines) => {
-    // console.log(room, lines);
     socket.to(room).emit("drawing", lines);
+    console.log(rooms);
   });
-  // socket.on("clearcanvas", (data) => {
-  //   socket.broadcast.emit("clearcanvas", data);
-  // });
-  // socket.on("disconnect", () => {
-  //   console.log("User disconnected");
-  // });
+  socket.on("clearCanvas", (room, lines) => {
+    socket.to(room).emit("clearCanvas", lines);
+    console.log(rooms);
+  });
+  socket.on("disconnect", () => {
+    getUserRooms(socket).forEach((room) => {
+      io.to(room).emit("user-disconnected", rooms[room].users[socket.id]);
+      delete rooms[room].users[socket.id];
+      if (Object.keys(rooms[room].users).length === 0) {
+        delete rooms[room];
+      }
+    });
+  });
 });
+
+const getUserRooms = (socket) => {
+  return Object.entries(socket.rooms)
+    .filter(([key, value]) => value !== socket.id)
+    .map(([key]) => key);
+};
 
 const DB = connectDB();
 app.use(express.json({ limit: "50mb" }));

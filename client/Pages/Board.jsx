@@ -52,34 +52,28 @@ export const Board = () => {
   const emitDrawingEvent = (lines) => {
     socket.emit("drawing", owner, lines);
   };
-
   useEffect(() => {
-    const roomFromURL = getRoomFromURL();
-    console.log(roomFromURL);
-    if (roomFromURL) {
-      socket.emit("join-Room", user.username || "Anonymous");
-    }
-
     const handleDrawandClear = (data) => {
       setLines(data);
     };
-    // socket.on("users-list", (data) => {
-    //   console.log(data);
-    // });
     socket.on("drawing", (data) => {
       handleDrawandClear(data);
     });
-
-    // socket.on("join-Room");
-    // socket.on("clearcanvas", handleDrawandClear);
-
-    // return () => {
-    //   socket.off("drawing", handleDrawandClear);
-    //   socket.off("clearcanvas", handleDrawandClear);
-    // };
+    socket.on("clearCanvas", (data) => {
+      handleDrawandClear(data);
+    });
+    socket.on("users-list", (users) => {
+      console.log(users);
+    });
+    return () => {
+      socket.disconnect();
+    };
   }, [socket]);
 
   useEffect(() => {
+    if (Object.keys(user).length != 0) {
+      socket.emit("join-Room", user.username, user.username);
+    }
     const savedState = localStorage.getItem("drawingApp");
     if (savedState) {
       setLines(JSON.parse(savedState));
@@ -208,7 +202,7 @@ export const Board = () => {
 
   const handleClearCanvas = () => {
     setLines([]);
-    socket.emit("clearcanvas", []);
+    socket.emit("clearCanvas", owner, []);
     updateUndoRedoHistory();
   };
 

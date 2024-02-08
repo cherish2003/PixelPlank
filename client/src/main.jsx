@@ -6,11 +6,14 @@ import "./index.css";
 import "@radix-ui/themes/styles.css";
 import UserProvider from "../Context/UserProvider.jsx";
 import { BrowserRouter } from "react-router-dom";
+import { RoomProvider } from "../Context/RoomProvider.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <BrowserRouter>
-    <UserProvider>
-      <App />
-    </UserProvider>
+    <RoomProvider>
+      <UserProvider>
+        <App />
+      </UserProvider>
+    </RoomProvider>
   </BrowserRouter>
 );

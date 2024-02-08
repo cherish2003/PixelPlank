@@ -21,12 +21,17 @@ export const MenuBar = ({ undo, redo, clearAll, downloadImage, socket }) => {
     const pathSegments = window.location.pathname.split("/");
     return pathSegments[2];
   };
-  const x = getRoomFromURL();
 
+  const roomname = getRoomFromURL();
   const { user } = useContext(UserContext);
+  console.log(user);
   const [bookmarksChecked, setBookmarksChecked] = React.useState(true);
   const [urlsChecked, setUrlsChecked] = React.useState(false);
-  const [person, setPerson] = React.useState("pedro");
+  const copyToClipboard = async () => {
+    await navigator.clipboard.writeText(
+      `http://localhost:5173/whiteboard/${user.username}`
+    );
+  };
   return (
     <Toolbar.Root className="ToolbarRoot" aria-label="Formatting options">
       <Toolbar.Button className="ToolbarButton" onClick={undo}>
@@ -149,15 +154,32 @@ export const MenuBar = ({ undo, redo, clearAll, downloadImage, socket }) => {
       </div>
 
       <Toolbar.Separator className="ToolbarSeparator" />
-      <Toolbar.Button className="ToolbarButton">Share</Toolbar.Button>
-      <Toolbar.Button
-        className="ToolbarButton"
-        onClick={() => {
-          socket.emit("join-Room", x);
-        }}
-      >
-        Join Room
-      </Toolbar.Button>
+      {Object.keys(user).length != 0 ? (
+        <div className="">
+          <Toolbar.Button className="ToolbarButton" onClick={copyToClipboard}>
+            Share
+          </Toolbar.Button>
+          <Toolbar.Button
+            className="ToolbarButton"
+            onClick={() => {
+              socket.emit("join-Room", roomname, user.username);
+            }}
+          >
+            Join Room
+          </Toolbar.Button>
+        </div>
+      ) : (
+        <Toolbar.Button
+          className="ToolbarButton"
+          onClick={() => {
+            const userName =
+              Object.keys(user).length == 0 ? "anonymous" : user.userame;
+            socket.emit("join-Room", roomname, userName);
+          }}
+        >
+          Join Room
+        </Toolbar.Button>
+      )}
     </Toolbar.Root>
   );
 };
