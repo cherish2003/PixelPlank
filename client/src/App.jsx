@@ -23,37 +23,36 @@ import { useContext } from "react";
 function App() {
   const navigate = useNavigate();
   const { user } = useContext(UserContext);
-  console.log(user);
-
-  const [loading, setLoading] = useState(true);
-  const [data, setdata] = useState();
-  const [Cookies] = useCookies(["accesstoken"]);
   const getRoomFromURL = () => {
     const pathSegments = window.location.pathname.split("/");
     return pathSegments[2];
   };
+  const RoomOwner = getRoomFromURL();
+  const [loading, setLoading] = useState(true);
+  const [data, setdata] = useState(null);
+  const [Cookies] = useCookies(["accesstoken"]);
 
   useEffect(() => {
-    const url = getRoomFromURL();
-    console.log(url);
-    if (url && window.location.pathname === "/") {
-      navigate(`/whiteboard/${url}`, { replace: true });
+    if (Object.keys(user).length != 0) {
+      navigate(`/whiteboard/${user.username}`, { replace: true });
     }
-  }, [navigate]);
+  }, [user]);
 
   useEffect(() => {
     const getAccessToken = async () => {
       try {
         const res = await tokenApi.get("");
-        setdata(res.data);
+        console.log(res.data);
+        // setdata(res.data);
       } catch (error) {
         if (error) {
-          setdata(error.response.data);
+          console.log(error);
+          // setdata(error.response.data);
         }
       }
     };
     getAccessToken();
-  }, [Cookies.accesstoken]);
+  }, [Cookies.accesstoken && RoomOwner != "anonymous"]);
 
   // useEffect(() => {
   //   if (data) {
@@ -75,6 +74,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/whiteboard/:username" element={<Board />} />
+        <Route path="/whiteboard/anonymous" element={<Board />} />
+        <Route path="*" element={<Navigate to="/whiteboard/anonymous" />} />
       </Routes>
     </>
   );

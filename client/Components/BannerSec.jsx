@@ -53,7 +53,13 @@ export const BannerSec = forwardRef((props, ref) => {
   });
   const { user, setUser } = useContext(UserContext);
 
-  const theme = "darks";
+  useEffect(() => {
+    if (Object.keys(user).length !== 0) {
+      navigate(`/whiteboard/${user.username}`, { replace: true });
+    }
+  }, [user]);
+
+  const theme = "darksd";
   const lightForm = "LightForm";
   const darkform = "DarkForm";
   const Formstyle = theme === "dark" ? darkform : lightForm;
@@ -146,7 +152,6 @@ export const BannerSec = forwardRef((props, ref) => {
       setResponsemessage(response.data.message);
       setUser(response.data.user);
       setToast(true);
-      navigate(`/whiteboard/${user.username}`, { replace: true });
     } catch (error) {
       setResponsemessage(error.response.data.message);
       setToast(true);

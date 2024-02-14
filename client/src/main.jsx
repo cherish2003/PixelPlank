@@ -7,6 +7,7 @@ import "@radix-ui/themes/styles.css";
 import UserProvider from "../Context/UserProvider.jsx";
 import { BrowserRouter } from "react-router-dom";
 import { RoomProvider } from "../Context/RoomProvider.jsx";
+import { RoomUsers } from "../Components/Room/RoomUsers.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <BrowserRouter>

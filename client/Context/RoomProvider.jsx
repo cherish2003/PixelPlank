@@ -1,38 +1,66 @@
 import React, { createContext, useEffect, useReducer, useState } from "react";
 
 const initialState = {
-  curr_user_action: "null",
   InRoom: false,
-  users_in_room: {},
+  Room_owner: null,
+  users_in_room: [],
 };
 
 const Roomreducer = (state, action) => {
   switch (action.type) {
+    case "Create":
+      return {
+        ...state,
+        Room_owner: action.payload,
+        InRoom: true,
+      };
     case "Join":
       return {
         ...state,
-        curr_user_action: action,
         InRoom: true,
       };
     case "Leave":
       return {
         ...state,
-        curr_user_action: action,
+        Room_owner: null,
         InRoom: false,
       };
-    case "Users":
-      const { total_users } = action.payload;
+    case "userList":
       return {
         ...state,
-        users_in_room: total_users,
+        users_in_room: action.payload,
       };
   }
 };
 export const Roomcontext = createContext(initialState);
 export const RoomProvider = ({ children }) => {
   const [state, dispatch] = useReducer(Roomreducer, initialState);
+  const JoinRoom = () => {
+    dispatch({ type: "Join" });
+  };
+  const CreateRoom = (RoomOwner) => {
+    dispatch({ type: "Create", payload: RoomOwner });
+  };
+  const LeaveRoom = () => {
+    dispatch({ type: "Leave" });
+  };
+  const setRoomUsers = (List) => {
+    dispatch({ type: "userList", payload: List });
+  };
+  const getRoomUsers = () => {
+    return state.users_in_room;
+  };
+
   return (
-    <Roomcontext.Provider value={{ roomdata: state, roomDispatch: dispatch }}>
+    <Roomcontext.Provider
+      value={{
+        roomdata: state,
+        JoinRoom: JoinRoom,
+        CreateRoom: CreateRoom,
+        LeaveRoom: LeaveRoom,
+        SetusersList: setRoomUsers,
+      }}
+    >
       {children}
     </Roomcontext.Provider>
   );

@@ -1,6 +1,6 @@
 import { user } from "../models/user.model.js";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
+// import bcrypt from "bcrypt";
 import cloudinary from "../utils/cloudinary.js";
 
 const generateTokens = (data) => {
@@ -46,7 +46,7 @@ const loginUser = async (req, res) => {
       });
     }
     const encrypass = existingUser.password;
-    const passRes = await bcrypt.compare(password, encrypass);
+    // const passRes = await bcrypt.compare(password, encrypass);
     if (!passRes) {
       return res.status(422).json({
         success: false,
@@ -117,17 +117,8 @@ const registerUser = async (req, res) => {
 };
 
 const getUserData = async (req, res) => {
-  const Userid = req.user;
-  console.log(Userid);
-  // try {
-  //   const UserData = await user.findById(Userid);
-  //   console.log(UserData);
-  // } catch (error) {
-  //   console.log(error);
-  //   return res.status(404).json({
-  //     message: "User not found",
-  //   });
-  // }
+  const userId = req.params.id;
+  console.log(userId);
 };
 
 const getRefreshToken = async (req, res) => {

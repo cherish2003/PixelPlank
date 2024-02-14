@@ -14,16 +14,26 @@ import { RecCom } from "../Components/CanvasComponents/Shapes/RecCom";
 import { Tool } from "../Components/Tool";
 import { LineSegment } from "../Components/CanvasComponents/Shapes/LineSegment";
 import { ArrowCom } from "../Components/CanvasComponents/Shapes/Arrow";
-import { Userbar } from "../Components/Userbar";
 import { MenuBar } from "../Components/Menu/MenuBar";
 import { UserContext } from "../Context/UserProvider";
 
 import { io } from "socket.io-client";
+import { RoomUsers } from "../Components/Room/RoomUsers";
+import { Roomcontext } from "../Context/RoomProvider";
+import { ResponseToast } from "../Components/ResponseToast";
+import { useNavigate } from "react-router-dom";
 
 const socket = io("http://localhost:4500");
 
 export const Board = () => {
+  const navigate = useNavigate();
+
   const { user } = useContext(UserContext);
+  const { roomdata, JoinRoom, LeaveRoom, CreateRoom, SetusersList } =
+    useContext(Roomcontext);
+  const [roomname, setRoomname] = useState("");
+  console.log("roomname", roomname);
+  console.log(roomdata.users_in_room);
   const [lines, setLines] = useState([]);
   const [undoHistory, setUndoHistory] = useState([]);
   const [redoHistory, setRedoHistory] = useState([]);
@@ -49,13 +59,31 @@ export const Board = () => {
     setRedoHistory([]);
   };
   const owner = getRoomFromURL();
+  console.log(roomdata.Room_owner);
   const emitDrawingEvent = (lines) => {
-    socket.emit("drawing", owner, lines);
+    if (roomdata.InRoom && user.username == roomdata.Room_owner) {
+      socket.emit("drawing", roomdata.Room_owner, lines);
+    }
+    if (roomdata.InRoom && !roomdata.Room_owner) {
+      socket.emit("drawing", roomname, lines);
+    }
   };
+
   useEffect(() => {
     const handleDrawandClear = (data) => {
       setLines(data);
     };
+    socket.on("userLeft", (data) => {
+      console.log(data);
+    });
+    socket.on("status", (status) => {
+      if (status == "Joined") {
+        JoinRoom();
+      }
+      if (status == "Left") {
+        LeaveRoom();
+      }
+    });
     socket.on("drawing", (data) => {
       handleDrawandClear(data);
     });
@@ -63,26 +91,27 @@ export const Board = () => {
       handleDrawandClear(data);
     });
     socket.on("users-list", (users) => {
-      console.log(users);
+      console.log(typeof users);
+      SetusersList(users);
     });
     return () => {
-      socket.disconnect();
+      // socket.off("status", handleStatus);
+      // socket.off("drawing", handleDrawing);
+      // socket.off("clearCanvas", handleClearCanvas);
+      // socket.off("users-list", handleUsersList);
     };
   }, [socket]);
 
   useEffect(() => {
     if (Object.keys(user).length != 0) {
-      socket.emit("join-Room", user.username, user.username);
+      socket.emit("join-Room", user.username, user.username, user._id);
+      CreateRoom(user.username);
     }
     const savedState = localStorage.getItem("drawingApp");
     if (savedState) {
       setLines(JSON.parse(savedState));
     }
   }, []);
-
-  // useEffect(() => {
-  //   localStorage.setItem("drawingApp", JSON.stringify(lines));
-  // }, [lines]);
 
   const handleMouseDown = (event) => {
     isDrawing.current = true;
@@ -136,7 +165,6 @@ export const Board = () => {
         },
       ]);
     }
-
     updateUndoRedoHistory();
   };
 
@@ -183,7 +211,6 @@ export const Board = () => {
     setLines(updatedLines);
     emitDrawingEvent(updatedLines);
   };
-
   const handleMouseUp = () => {
     isDrawing.current = false;
   };
@@ -217,9 +244,9 @@ export const Board = () => {
     updateUndoRedoHistory();
   };
 
-  const handleTextChange = (event) => {
-    setText(event.target.value);
-  };
+  // const handleTextChange = (event) => {
+  //   setText(event.target.value);
+  // };
 
   const undo = () => {
     if (undoHistory.length > 0) {
@@ -236,7 +263,6 @@ export const Board = () => {
       setLines(nextState);
     }
   };
-
   const downloadImage = () => {
     const dataUrl = canvas.current.toDataURL();
     const link = document.createElement("a");
@@ -253,6 +279,8 @@ export const Board = () => {
         clearAll={handleClearCanvas}
         downloadImage={downloadImage}
         socket={socket}
+        roomname={roomname}
+        setRoomname={setRoomname}
       />
       <Tool
         setShape={setShape}
@@ -267,7 +295,8 @@ export const Board = () => {
         handleFontsize={handleFontsize}
         setRadius={setRadius}
       />
-
+      <RoomUsers />
+      {/* <ResponseToast /> */}
       <Stage
         width={window.innerWidth}
         height={window.innerHeight}

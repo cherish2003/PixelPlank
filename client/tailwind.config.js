@@ -6,6 +6,7 @@ export default {
     extend: {
       backgroundColor: {
         "custom-grey": "#212529",
+        "custom-green": "#33332d",
       },
       colors: {
         "custom-grey": "#212529",
