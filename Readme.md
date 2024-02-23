@@ -60,13 +60,13 @@ Pixel Plank is a collaborative whiteboard application designed for real-time dra
 1. Clone the repository from GitHub:
 
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/cherish2003/PixelPlank.git
    ```
 
 2. Navigate to the project directory:
 
    ```bash
-   cd pixel-plank
+   cd Pixelplank
    ```
 
 3. Install dependencies for both frontend and backend:
