@@ -9,7 +9,7 @@ import { PiLineSegmentBold } from "react-icons/pi";
 import { FaArrowRightLong } from "react-icons/fa6";
 
 import * as Popover from "@radix-ui/react-popover";
-import { MixerHorizontalIcon, Cross2Icon } from "@radix-ui/react-icons";
+import { Cross2Icon } from "@radix-ui/react-icons";
 import "./App.scss";
 import { CustomSlider } from "./Toolbox/Slider";
 import { CompactPicker } from "react-color";
@@ -41,7 +41,7 @@ export const Tool = ({
 
   const handleCLick = (item) => {
     item == "Eraser" ? toggleEraser(true) : toggleEraser(false),
-    item == "Text" ? drawShape("text") : null;
+      item == "Text" ? drawShape("text") : null;
   };
   const items = [
     {
@@ -198,37 +198,6 @@ export const Tool = ({
                                 }`}
                               >
                                 <PiLineSegmentBold size={35} />
-                              </HoverCard.Trigger>
-                              <HoverCard.Portal>
-                                <HoverCard.Content
-                                  className="HoverCardContent"
-                                  sideOffset={-120}
-                                >
-                                  <fieldset className="Fieldset">
-                                    <label className="Label" htmlFor="height">
-                                      Width
-                                    </label>
-                                    <input
-                                      className="Input"
-                                      id="height"
-                                      defaultValue="5"
-                                      onChange={(e) => {
-                                        setWidth(parseInt(e.target.value));
-                                      }}
-                                    />
-                                  </fieldset>
-                                </HoverCard.Content>
-                              </HoverCard.Portal>
-                            </HoverCard.Root>
-
-                            <HoverCard.Root>
-                              <HoverCard.Trigger
-                                onClick={() => setCurrShape("arrow")}
-                                className={`Shape ${
-                                  currShape == "arrow" ? "ShapeScale" : ""
-                                }`}
-                              >
-                                <FaArrowRightLong size={25} />
                               </HoverCard.Trigger>
                               <HoverCard.Portal>
                                 <HoverCard.Content

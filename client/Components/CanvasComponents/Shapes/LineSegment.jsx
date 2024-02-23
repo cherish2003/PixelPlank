@@ -1,12 +1,13 @@
+import { color } from "framer-motion";
 import React from "react";
 import { Line } from "react-konva";
 
-export const LineSegment = ({ lines, line, setLines, setShape, width }) => {
+export const LineSegment = ({ lines, line, setLines, setShape, width, color }) => {
   return (
     <Line
       points={line.points}
       strokeWidth={width}
-      stroke="blue"
+      stroke={color}
       draggable
       onDragEnd={(e) => {
         const newPoints = [...line.points];

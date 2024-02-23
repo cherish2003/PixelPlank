@@ -18,13 +18,13 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 export const BannerSec = forwardRef((props, ref) => {
+  const navigate = useNavigate();
   useImperativeHandle(ref, () => {
     return {
       Signuppage: SignupToggle,
       Loginpage: LoginToggle,
     };
   });
-  const navigate = useNavigate();
 
   const [signinPage, setsigninPage] = useState(true);
   const [signinanimation, setsigninanimation] = useState(true);
@@ -59,7 +59,7 @@ export const BannerSec = forwardRef((props, ref) => {
     }
   }, [user]);
 
-  const theme = "darksd";
+  const theme = "darsdk";
   const lightForm = "LightForm";
   const darkform = "DarkForm";
   const Formstyle = theme === "dark" ? darkform : lightForm;
@@ -474,6 +474,7 @@ export const BannerSec = forwardRef((props, ref) => {
         response={responsemessage}
         Open={Toast}
         setToast={setToast}
+        type="loginandsignup"
       />
     </div>
   );

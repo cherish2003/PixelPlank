@@ -1,6 +1,29 @@
+import { useContext } from "react";
 import { Rect } from "react-konva";
+import { Roomcontext } from "../../../Context/RoomProvider";
+import { SocketContext } from "../../../Context/SocketProvider";
 
-export const RecCom = ({ lines, line, setLines, setShape }) => {
+export const RecCom = ({ lines, line, index, setLines, color }) => {
+  const { socket } = useContext(SocketContext);
+
+  const { roomdata } = useContext(Roomcontext);
+
+  const handleDragEnd = (e) => {
+    const { x, y, width, height } = e.target.attrs;
+
+    const updatedLines = lines.map((l, i) => {
+      if (i === index) {
+        return {
+          ...l,
+          points: [x, y, x + width, y + height],
+        };
+      }
+      return l;
+    });
+    setLines(updatedLines);
+    socket.emit("shapeMoved", roomdata.Room_owner, updatedLines);
+  };
+
   return (
     <Rect
       key={line.id}
@@ -9,19 +32,8 @@ export const RecCom = ({ lines, line, setLines, setShape }) => {
       width={line.points[2] - line.points[0]}
       height={line.points[3] - line.points[1]}
       draggable
-      fill="red"
-      onDragEnd={(e) => {
-        const newPoints = [...line.points];
-        newPoints[0] = e.target.x();
-        newPoints[1] = e.target.y();
-        newPoints[2] = e.target.x() + e.target.width();
-        newPoints[3] = e.target.y() + e.target.height();
-        const updatedLines = lines.map((l) =>
-          l.id === line.id ? { ...l, points: newPoints } : l
-        );
-
-        setLines(updatedLines);
-      }}
+      fill={color}
+      onDragEnd={handleDragEnd}
     />
   );
 };

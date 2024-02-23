@@ -4,15 +4,36 @@ import { motion, AnimatePresence } from "framer-motion";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { Roomcontext } from "../../Context/RoomProvider";
 import "../App.scss";
-import { getUserData } from "../../../Server/src/controllers/userController";
-export const RoomUsers = () => {
+import { getUserdata } from "../../Api/userApi";
+import { UserContext } from "../../Context/UserProvider";
+import { SocketContext } from "../../Context/SocketProvider";
+
+export const RoomUsers = ({ setToast, setMessage }) => {
   const [users, setUsers] = useState([]);
+  const [newlyAdded, setNewlyAdded] = useState([]);
+  const { socket } = useContext(SocketContext);
+
   const [usersData, setusersData] = useState([]);
   const { roomdata } = useContext(Roomcontext);
-  // const getdataofUser = async (id) => {
-  //   const data = await getUserData.get(`${id}`);
-  //   return data;
-  // };
+  const { user } = useContext(UserContext);
+  const [left, setleft] = useState(false);
+
+  useEffect(() => {
+    // setMessage(`${user.username} left his own room `);
+    setNewlyAdded([]);
+    setUsers([]);
+    // setToast(true);
+    setleft(!roomdata.InRoom);
+  }, [roomdata.InRoom]);
+
+  useEffect(() => {
+    socket.on("userLeft", (user_id, roomName) => {
+      const Updatedusers = usersData.filter((usr) => usr._id !== user_id);
+      setUsers(Updatedusers);
+      setMessage(`${roomName} left the room 👋`);
+      setToast(true);
+    });
+  }, [socket]);
 
   useEffect(() => {
     setusersData(
@@ -20,17 +41,32 @@ export const RoomUsers = () => {
         return item.id;
       })
     );
+    console.log(users);
   }, [roomdata.users_in_room]);
 
-  // useEffect(() => {
-  //   // for (let i = 0; i < usersData.length; i++) {
-  //   //   const element = usersData[i];
-  //   //   const data = getdataofUser(element);
-  //   //   console.log(data);
-  //   // }
-  // }, [usersData]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await Promise.all(
+          usersData.map(async (element) => {
+            const res = await getUserdata(element);
+            if (
+              !users.some((user) => user.username === res.data.data.username)
+            ) {
+              // setMessage(`${res.data.data.username} Joined 👦🏻`);
+              setUsers((prevUsers) => [...prevUsers, res.data.data]);
+              setNewlyAdded((prev) => [...prev, res.data.data]);
+            }
+          })
+        );
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
 
-  const [newlyAdded, setNewlyAdded] = useState([]);
+    fetchData();
+  }, [usersData]);
+
   const usersContainer = useRef(null);
 
   useEffect(() => {
@@ -47,15 +83,6 @@ export const RoomUsers = () => {
     }
   }, [newlyAdded]);
 
-  const addUser = () => {
-    const newUser = {
-      name: "New User",
-      imgURL: "https://randomuser.me/api/portraits/lego/7.jpg",
-    };
-    setUsers((prevUsers) => [...prevUsers, newUser]);
-    setNewlyAdded((prev) => [...prev, newUser]);
-  };
-
   return (
     <div className="absolute bottom-3 left-5  w-44 h-[70px] users_shadow rounded-lg  flex items-center justify-center ">
       <div
@@ -67,15 +94,13 @@ export const RoomUsers = () => {
             const isNewlyAdded = newlyAdded.some(
               (newUser) => newUser.imgURL === item.imgURL
             );
-            console.log(isNewlyAdded);
             return (
               <Tooltip.Provider>
                 <Tooltip.Root>
                   <motion.div
-                    key={idx}
                     initial={{ x: isNewlyAdded ? 100 : 0 }}
                     animate={{ x: 0 }}
-                    exit={{ x: 100 }}
+                    exit={{ x: left ? 100 : -100 }}
                     transition={{ duration: 0.5 }}
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
@@ -83,7 +108,7 @@ export const RoomUsers = () => {
                     <Tooltip.Trigger asChild>
                       <Avatar.Root className="border-2 border-black h-12 w-12 flex items-center justify-center overflow-hidden rounded-full">
                         <Avatar.Image
-                          src={item.imgURL}
+                          src={item.avatar}
                           className="object-cover"
                         />
                         <Avatar.Fallback>{item.name}</Avatar.Fallback>
@@ -94,7 +119,7 @@ export const RoomUsers = () => {
                         className="TooltipContent"
                         sideOffset={5}
                       >
-                        Ayyappa
+                        {item.username}
                         <Tooltip.Arrow className="TooltipArrow" />
                       </Tooltip.Content>
                     </Tooltip.Portal>
@@ -105,7 +130,6 @@ export const RoomUsers = () => {
           })}
         </AnimatePresence>
       </div>
-      {/* <button onClick={addUser}>click</button> */}
     </div>
   );
 };

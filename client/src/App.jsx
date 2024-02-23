@@ -2,11 +2,8 @@ import { useState, useEffect } from "react";
 import { motion, AnimateSharedLayout, AnimatePresence } from "framer-motion";
 
 import "./App.css";
-import { Navbar } from "../Components/Navbar";
 import { Home } from "../Pages/Home";
 import { Board } from "../Pages/Board";
-import { Test } from "../Components/Test";
-import { Tool } from "../Components/Tool";
 import Cookies from "js-cookie";
 import {
   BrowserRouter,
@@ -22,7 +19,7 @@ import { useContext } from "react";
 
 function App() {
   const navigate = useNavigate();
-  const { user } = useContext(UserContext);
+  const { user, logoutUser } = useContext(UserContext);
   const getRoomFromURL = () => {
     const pathSegments = window.location.pathname.split("/");
     return pathSegments[2];
@@ -42,8 +39,9 @@ function App() {
     const getAccessToken = async () => {
       try {
         const res = await tokenApi.get("");
-        console.log(res.data);
-        // setdata(res.data);
+        if (res.data.logout) {
+          logoutUser();
+        }
       } catch (error) {
         if (error) {
           console.log(error);
@@ -54,27 +52,15 @@ function App() {
     getAccessToken();
   }, [Cookies.accesstoken && RoomOwner != "anonymous"]);
 
-  // useEffect(() => {
-  //   if (data) {
-  //     const { logout } = data;
-  //     console.log(logout);
-  //     if (logout) {
-  //       navigate("/", { replace: true });
-  //     }
-  //   }
-  // }, [data]);
 
-  useEffect(() => {
-    loading
-      ? document.querySelector("body").classList.add("loading")
-      : document.querySelector("body").classList.remove("loading");
-  }, [loading]);
+
   return (
     <>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/whiteboard/:username" element={<Board />} />
         <Route path="/whiteboard/anonymous" element={<Board />} />
+        {/* <Route path="/dummpy" element={} /> */}
         <Route path="*" element={<Navigate to="/whiteboard/anonymous" />} />
       </Routes>
     </>

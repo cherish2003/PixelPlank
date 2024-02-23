@@ -14,3 +14,6 @@ export const tokenApi = axios.create({
 export const getUserdata = axios.create({
   baseURL: `${process.env.API_URL}/user/getdata`,
 });
+export const validateToken = axios.create({
+  baseURL: `${process.env.API_URL}/user/verifyId`,
+});

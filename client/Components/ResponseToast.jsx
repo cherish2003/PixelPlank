@@ -5,9 +5,7 @@ import { FaCheckCircle } from "react-icons/fa";
 
 import "./App.scss";
 
-export const ResponseToast = ({ response, Open, setToast }) => {
-  //     return () => clearTimeout(timerRef.current);
-  //   }, []);
+export const ResponseToast = ({ response, Open, setToast, type }) => {
   useEffect(() => {
     setTimeout(() => {
       setToast(false);
@@ -20,7 +18,7 @@ export const ResponseToast = ({ response, Open, setToast }) => {
     }
     return false;
   };
-  return (
+  return type == "loginandsignup" ? (
     <Toast.Provider swipeDirection="right">
       <Toast.Root
         className="ToastRoot"
@@ -46,6 +44,18 @@ export const ResponseToast = ({ response, Open, setToast }) => {
             </div>
           )}
         </Toast.Title>
+      </Toast.Root>
+      <Toast.Viewport className="ToastViewport" />
+    </Toast.Provider>
+  ) : (
+    <Toast.Provider swipeDirection="right">
+      <Toast.Root
+        className="ToastRoot"
+        open={Open}
+        onOpenChange={!Open}
+        duration={3000}
+      >
+        <Toast.Title>{response}</Toast.Title>
       </Toast.Root>
       <Toast.Viewport className="ToastViewport" />
     </Toast.Provider>

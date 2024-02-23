@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 
-export const Verifyjwt = (req, res, next) => {
+export const Verifyjwt = (req, res) => {
   try {
     const accesstoken = req.cookies.accesstoken;
     console.log(accesstoken);
@@ -15,16 +15,18 @@ export const Verifyjwt = (req, res, next) => {
       if (err) {
         console.log(err);
         return res.clearCookie("accesstoken").status(498).json({
-          message: "Token expired",
-          expired: true,
+          logout: true,
         });
       }
-      req.user = user;
-      next();
+    });
+
+    return res.status(200).json({
+      logout: false,
     });
   } catch (error) {
     res.status(401).json({
       message: "Invaild Token",
+      logout: true,
     });
     console.log(error);
   }

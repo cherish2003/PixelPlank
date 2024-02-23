@@ -1,38 +1,27 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
-import {
-  Stage,
-  Layer,
-  Line,
-  Rect,
-  Circle,
-  Text as KonvaText,
-} from "react-konva";
-import { CompactPicker } from "react-color";
-import { Test } from "../Components/Test";
+import { Stage, Layer, Line } from "react-konva";
+import { TextCom } from "../Components/TextCom";
 import { CircleCom } from "../Components/CanvasComponents/Shapes/CircleCom";
 import { RecCom } from "../Components/CanvasComponents/Shapes/RecCom";
 import { Tool } from "../Components/Tool";
 import { LineSegment } from "../Components/CanvasComponents/Shapes/LineSegment";
-import { ArrowCom } from "../Components/CanvasComponents/Shapes/Arrow";
+
 import { MenuBar } from "../Components/Menu/MenuBar";
 import { UserContext } from "../Context/UserProvider";
-
-import { io } from "socket.io-client";
 import { RoomUsers } from "../Components/Room/RoomUsers";
 import { Roomcontext } from "../Context/RoomProvider";
 import { ResponseToast } from "../Components/ResponseToast";
 import { useNavigate } from "react-router-dom";
-
-const socket = io("http://localhost:4500");
+import { SocketContext } from "../Context/SocketProvider";
 
 export const Board = () => {
-  const navigate = useNavigate();
 
   const { user } = useContext(UserContext);
+  const { socket } = useContext(SocketContext);
   const { roomdata, JoinRoom, LeaveRoom, CreateRoom, SetusersList } =
     useContext(Roomcontext);
   const [roomname, setRoomname] = useState("");
-  console.log("roomname", roomname);
+  console.log(user);
   console.log(roomdata.users_in_room);
   const [lines, setLines] = useState([]);
   const [undoHistory, setUndoHistory] = useState([]);
@@ -42,11 +31,19 @@ export const Board = () => {
   const [isEraser, setIsEraser] = useState(false);
   const [fontSize, setFontSize] = useState(25);
   const [width, setWidth] = useState(5);
-  const [shapeChange, setShapeChange] = useState(false);
   const [radius, setRadius] = useState(50);
   const [shape, setShape] = useState("");
   const [text, setText] = useState(null);
   const [textPosition, setTextPosition] = useState({ x: 0, y: 0 });
+  const [Toast, setToast] = useState(false);
+  const [message, setMessage] = useState("");
+  const [audioRef, setAudioRef] = useState(null);
+
+  const [rectangleColor, setRectangleColor] = useState("#000000");
+  const [circleColor, setCircleColor] = useState("#000000");
+  const [textColor, setTextColor] = useState("#000000");
+  const [lineSegColor, setLineSegColor] = useState("#000000");
+
   const isDrawing = useRef(false);
   const canvas = useRef(null);
   const getRoomFromURL = () => {
@@ -73,16 +70,19 @@ export const Board = () => {
     const handleDrawandClear = (data) => {
       setLines(data);
     };
-    socket.on("userLeft", (data) => {
-      console.log(data);
-    });
-    socket.on("status", (status) => {
+
+    socket.on("status", (status, message) => {
       if (status == "Joined") {
         JoinRoom();
+        setMessage(`${message} joined 👦🏻`);
+        setToast(true);
       }
       if (status == "Left") {
         LeaveRoom();
       }
+    });
+    socket.on("shapeMoved", (updatedLines) => {
+      handleDrawandClear(updatedLines);
     });
     socket.on("drawing", (data) => {
       handleDrawandClear(data);
@@ -91,14 +91,13 @@ export const Board = () => {
       handleDrawandClear(data);
     });
     socket.on("users-list", (users) => {
-      console.log(typeof users);
       SetusersList(users);
     });
     return () => {
-      // socket.off("status", handleStatus);
-      // socket.off("drawing", handleDrawing);
-      // socket.off("clearCanvas", handleClearCanvas);
-      // socket.off("users-list", handleUsersList);
+      socket.off("status");
+      socket.off("drawing", handleDrawandClear);
+      socket.off("clearCanvas", handleDrawandClear);
+      socket.off("users-list");
     };
   }, [socket]);
 
@@ -114,17 +113,17 @@ export const Board = () => {
   }, []);
 
   const handleMouseDown = (event) => {
-    isDrawing.current = true;
+    if (owner !== "anonymous") {
+      isDrawing.current = true;
+    } else {
+      setToast(true);
+      setMessage("Login to draw and access more 🔓");
+    }
     const pos = event.target.getStage().getPointerPosition();
     setTextPosition(pos);
 
     if (shape !== "text") {
-      if (
-        shape === "rectangle" ||
-        shape === "circle" ||
-        shape === "lineseg" ||
-        shape === "arrow"
-      ) {
+      if (shape === "rectangle" || shape === "circle" || shape === "lineseg") {
         setLines([
           ...lines,
           {
@@ -216,7 +215,23 @@ export const Board = () => {
   };
 
   const handleColorChange = (newColor) => {
-    setColor(newColor.hex);
+    switch (shape) {
+      case "rectangle":
+        setRectangleColor(newColor.hex);
+        break;
+      case "circle":
+        setCircleColor(newColor.hex);
+        break;
+      case "text":
+        setTextColor(newColor.hex);
+        break;
+      case "lineseg":
+        setLineSegColor(newColor.hex);
+        break;
+      default:
+        setColor(newColor.hex);
+        break;
+    }
   };
 
   const handleBrushSizeChange = (value) => {
@@ -244,10 +259,6 @@ export const Board = () => {
     updateUndoRedoHistory();
   };
 
-  // const handleTextChange = (event) => {
-  //   setText(event.target.value);
-  // };
-
   const undo = () => {
     if (undoHistory.length > 0) {
       const previousState = undoHistory.pop();
@@ -272,31 +283,34 @@ export const Board = () => {
   };
 
   return (
-    <div className="App">
+    <div>
       <MenuBar
         undo={undo}
         redo={redo}
         clearAll={handleClearCanvas}
         downloadImage={downloadImage}
-        socket={socket}
         roomname={roomname}
         setRoomname={setRoomname}
+        setToast={setToast}
+        setMessage={setMessage}
       />
-      <Tool
-        setShape={setShape}
-        shape={shape}
-        Drawingstate={isDrawing.current}
-        toggleEraser={toggleEraser}
-        drawShape={drawShape}
-        setIsEraser={setIsEraser}
-        setWidth={setWidth}
-        handleBrushSizeChange={handleBrushSizeChange}
-        handleColorChange={handleColorChange}
-        handleFontsize={handleFontsize}
-        setRadius={setRadius}
-      />
-      <RoomUsers />
-      {/* <ResponseToast /> */}
+      {owner == "anonymous" ? null : (
+        <Tool
+          setShape={setShape}
+          shape={shape}
+          Drawingstate={isDrawing.current}
+          toggleEraser={toggleEraser}
+          drawShape={drawShape}
+          setIsEraser={setIsEraser}
+          setWidth={setWidth}
+          handleBrushSizeChange={handleBrushSizeChange}
+          handleColorChange={handleColorChange}
+          handleFontsize={handleFontsize}
+          setRadius={setRadius}
+        />
+      )}
+      <RoomUsers setToast={setToast} setMessage={setMessage} />
+      <ResponseToast Open={Toast} setToast={setToast} response={message} />
       <Stage
         width={window.innerWidth}
         height={window.innerHeight}
@@ -306,14 +320,22 @@ export const Board = () => {
         ref={canvas}
       >
         <Layer>
-          {lines.map((line) => {
+          {lines.map((line, index) => {
             if (line.shape === "rectangle") {
               return (
-                <RecCom setShape={setShape} line={line} setLines={setLines} />
+                <RecCom
+                  color={rectangleColor}
+                  index={index}
+                  setShape={setShape}
+                  lines={lines}
+                  line={line}
+                  setLines={setLines}
+                />
               );
             } else if (line.shape === "circle") {
               return (
                 <CircleCom
+                  color={circleColor}
                   radius={radius}
                   setShape={setShape}
                   lines={lines}
@@ -323,8 +345,8 @@ export const Board = () => {
               );
             } else if (line.shape === "text") {
               return (
-                <Test
-                  color={color}
+                <TextCom
+                  color={textColor}
                   setShape={setShape}
                   lines={lines}
                   line={line}
@@ -336,20 +358,11 @@ export const Board = () => {
             } else if (line.shape === "lineseg") {
               return (
                 <LineSegment
+                  color={lineSegColor}
                   lines={lines}
                   setLines={setLines}
                   line={line}
                   setShape={setShape}
-                  width={width}
-                />
-              );
-            } else if (line.shape === "arrow") {
-              return (
-                <ArrowCom
-                  color={color}
-                  lines={lines}
-                  setLines={setLines}
-                  line={line}
                   width={width}
                 />
               );

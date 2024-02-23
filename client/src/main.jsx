@@ -7,13 +7,16 @@ import "@radix-ui/themes/styles.css";
 import UserProvider from "../Context/UserProvider.jsx";
 import { BrowserRouter } from "react-router-dom";
 import { RoomProvider } from "../Context/RoomProvider.jsx";
-import { RoomUsers } from "../Components/Room/RoomUsers.jsx";
+import { SocketProvider } from "../Context/SocketProvider.jsx";
+// import ErrorBoundary from "./ErrorBoundary";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <RoomProvider>
       <UserProvider>
-        <App />
+        <SocketProvider>
+          <App />
+        </SocketProvider>
       </UserProvider>
     </RoomProvider>
   </BrowserRouter>

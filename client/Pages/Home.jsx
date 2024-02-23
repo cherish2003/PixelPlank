@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Navbar } from "../Components/Navbar";
-import { DarkMode } from "../Components/DarkMode";
 import { BannerSec } from "../Components/BannerSec";
 import { useRef } from "react";
 

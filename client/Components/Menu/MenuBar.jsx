@@ -17,33 +17,34 @@ import { MdDelete } from "react-icons/md";
 import "./index.scss";
 import { UserContext } from "../../Context/UserProvider";
 import { Roomcontext } from "../../Context/RoomProvider";
-import { getUserdata } from "../../Api/userApi";
+import { SocketContext } from "../../Context/SocketProvider";
+import { useNavigate } from "react-router-dom";
 export const MenuBar = ({
   undo,
   redo,
   clearAll,
   downloadImage,
-  socket,
   setRoomname,
   roomname,
+  setToast,
+  setMessage,
 }) => {
   // const getRoomFromURL = () => {
   //   const pathSegments = window.location.pathname.split("/");
   //   return pathSegments[2];
   // };
-  // const roomname = getRoomFromURL();
-  const { user, logoutUser, getRoomUsers } = useContext(UserContext);
+  const navigate = useNavigate();
+  const { user, logoutUser } = useContext(UserContext);
+  const { socket } = useContext(SocketContext);
   const { username, email } = user;
   console.log(user);
   const { roomdata, JoinRoom, LeaveRoom } = useContext(Roomcontext);
-  const [bookmarksChecked, setBookmarksChecked] = React.useState(true);
-  const [urlsChecked, setUrlsChecked] = React.useState(false);
 
-  const copyToClipboard = async () => {
-    await navigator.clipboard.writeText(
-      `http://localhost:5173/whiteboard/${user.username}`
-    );
+  const logout = () => {
+    logoutUser();
+    navigate("/", { replace: true });
   };
+
   const joinRoom = () => {
     if (!roomdata.InRoom) {
       socket.emit(
@@ -54,10 +55,10 @@ export const MenuBar = ({
       );
       JoinRoom();
     } else {
-      console.log("Already in room");
+      setToast(true);
+      setMessage("Already in room 🏠");
     }
   };
-
 
   return (
     <Toolbar.Root className="ToolbarRoot" aria-label="Formatting options">
@@ -125,7 +126,7 @@ export const MenuBar = ({
                       <TextField.Input
                         placeholder="Enter username"
                         variant="soft"
-                        color="amber"
+                        color="bronze"
                         onChange={(e) => {
                           setRoomname(e.target.value);
                           console.log(roomname);
@@ -149,20 +150,18 @@ export const MenuBar = ({
                 className="DropdownMenuItem"
                 onClick={() => {
                   if (roomdata.InRoom) {
-                    socket.emit("leave", user._id);
+                    socket.emit("leave", user._id, user.username);
                     LeaveRoom();
                   } else {
-                    console.log("Not in room");
+                    setToast(true);
+                    setMessage("Not in room to leave 😞");
                   }
                 }}
               >
                 Leave Room
               </DropdownMenu.Item>
               <DropdownMenu.Separator className="DropdownMenuSeparator" />
-              <DropdownMenu.Item
-                className="DropdownMenuItem"
-                onClick={logoutUser}
-              >
+              <DropdownMenu.Item className="DropdownMenuItem" onClick={logout}>
                 Logout
               </DropdownMenu.Item>
 
@@ -172,9 +171,6 @@ export const MenuBar = ({
         </DropdownMenu.Root>
       </div>
       <Toolbar.Separator className="ToolbarSeparator" />
-      <Toolbar.Button className="ToolbarButton" onClick={copyToClipboard}>
-        Share
-      </Toolbar.Button>
     </Toolbar.Root>
   );
 };

@@ -30,7 +30,8 @@
     "js-cookie": "^3.0.5",
     "konva": "^9.3.0",
     "lodash": "^4.17.21",
-        "react": "^18.2.0",
+    "peerjs": "^1.5.2",
+    "react": "^18.2.0",
     "react-color": "^2.19.3",
     "react-cookie": "^7.0.1",
     "react-dom": "^18.2.0",
@@ -39,21 +40,27 @@
     "react-konva-utils": "^1.0.5",
     "react-router-dom": "^6.21.2",
     "socket.io-client": "^4.7.4",
-    "styled-components": "^6.1.0"
+    "styled-components": "^6.1.0",
+    "vite-plugin-node-polyfills": "^0.21.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
+    "@vitejs/plugin-basic-ssl": "^1.1.0",
     "@vitejs/plugin-react-swc": "^3.3.2",
     "autoprefixer": "^10.4.16",
     "eslint": "^8.45.0",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
+    "events": "^3.3.0",
+    "global": "^4.4.0",
     "postcss": "^8.4.31",
+    "process": "^0.11.10",
     "sass": "^1.69.5",
     "tailwindcss": "^3.3.5",
     "vite": "^4.4.5",
+    "vite-compatible-readable-stream": "^3.6.1",
     "vite-plugin-environment": "^1.1.3"
   }
 }

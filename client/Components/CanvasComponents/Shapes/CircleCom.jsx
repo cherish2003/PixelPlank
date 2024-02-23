@@ -1,7 +1,14 @@
 import React, { useState } from "react";
 import { Rect, Circle } from "react-konva";
 
-export const CircleCom = ({ lines, line, setShape, setLines, radius }) => {
+export const CircleCom = ({
+  lines,
+  line,
+  setShape,
+  setLines,
+  radius,
+  color,
+}) => {
   return (
     <Circle
       key={line.id}
@@ -9,7 +16,7 @@ export const CircleCom = ({ lines, line, setShape, setLines, radius }) => {
       y={line.points[1]}
       radius={radius}
       draggable
-      fill="red"
+      fill={color}
       onDragEnd={(e) => {
         const newPoints = [...line.points];
         newPoints[0] = e.target.x();

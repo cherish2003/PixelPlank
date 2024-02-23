@@ -1,6 +1,6 @@
 import { user } from "../models/user.model.js";
 import jwt from "jsonwebtoken";
-// import bcrypt from "bcrypt";
+import bcrypt from "bcrypt";
 import cloudinary from "../utils/cloudinary.js";
 
 const generateTokens = (data) => {
@@ -46,7 +46,7 @@ const loginUser = async (req, res) => {
       });
     }
     const encrypass = existingUser.password;
-    // const passRes = await bcrypt.compare(password, encrypass);
+    const passRes = await bcrypt.compare(password, encrypass);
     if (!passRes) {
       return res.status(422).json({
         success: false,
@@ -54,16 +54,15 @@ const loginUser = async (req, res) => {
       });
     }
 
-    // const options = {
-    //   httpOnly: true,
-    //   secure: true,
-    // };
+    const options = {
+      expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+    };
     existingUser.password = undefined;
     const { accesstoken, refreshToken } = generateTokens(existingUser);
     return res
       .status(200)
-      .cookie("accesstoken", accesstoken)
-      .cookie("refreshtoken", refreshToken)
+      .cookie("accesstoken", accesstoken, options)
+      .cookie("refreshtoken", refreshToken, options)
       .json({
         message: "Login successful",
         user: existingUser,
@@ -117,8 +116,19 @@ const registerUser = async (req, res) => {
 };
 
 const getUserData = async (req, res) => {
-  const userId = req.params.id;
-  console.log(userId);
+  const Userid = req.params.id;
+  try {
+    const UserData = await user.findById(Userid);
+    UserData.password = undefined;
+    return res.status(200).json({
+      data: UserData,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(404).json({
+      message: "User not found",
+    });
+  }
 };
 
 const getRefreshToken = async (req, res) => {
@@ -147,13 +157,11 @@ const getRefreshToken = async (req, res) => {
     const existedUser = await user.findById(userId);
     if (existedUser == null) {
       return res.status(404).json({
-        message: "User not found",
         logout: true,
       });
     }
     const { accesstoken } = generateTokens(userFromToken);
     res.status(200).cookie("accesstoken", accesstoken).json({
-      message: "Refreshed token",
       logout: false,
     });
   }

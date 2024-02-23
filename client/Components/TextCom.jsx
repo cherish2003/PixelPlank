@@ -1,21 +1,42 @@
-import React, { useState } from "react";
-import { render } from "react-dom";
+import React, { useContext, useEffect, useState } from "react";
 import { Stage, Layer, Group } from "react-konva";
 import { TextBox } from "./CanvasComponents/Text/TextBox";
+import { SocketContext } from "../Context/SocketProvider";
 
-export const Test = ({ setShape, lines, line, setLines, fontSize, color }) => {
+export const TextCom = ({
+  setShape,
+  lines,
+  line,
+  setLines,
+  fontSize,
+  color,
+}) => {
+  const { socket } = useContext(SocketContext);
+
   const [text, setDummpyText] = useState(
     "Click to resize. Double click to edit."
   );
   const [width, setWidth] = useState(200);
   const [height, setHeight] = useState(200);
   const [selected, setSelected] = useState(false);
-  // const
+  const [pos, setpos] = useState({ x: 285, y: 100 });
+
+  useEffect(() => {
+    socket.on("textChanged", (newText) => {
+      setDummpyText(newText);
+    });
+
+    socket.on("textMoved", (newPos) => {
+      setpos(newPos);
+    });
+  }, [socket]);
+
   return (
     <Group>
       <TextBox
-        x={285}
-        y={100}
+        x={pos.x}
+        y={pos.y}
+        socket={socket}
         text={text}
         colour={color}
         onTextChange={(value) => setDummpyText(value)}

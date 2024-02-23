@@ -1,5 +1,14 @@
+import { Box, Heading, Text } from "@radix-ui/themes";
+import * as HoverCard from "@radix-ui/react-hover-card";
+
 import React, { useState, useEffect } from "react";
 import styled, { ThemeProvider } from "styled-components";
+import { Avatar } from "@radix-ui/react-avatar";
+import { IoMdMail } from "react-icons/io";
+import { FaXTwitter } from "react-icons/fa6";
+import { FaLinkedin } from "react-icons/fa";
+
+import "./App.scss";
 
 export const Navbar = ({ loginclick, signupclick }) => {
   const [DarkModeToggle, setDarkModeToggle] = useState(false);
@@ -15,7 +24,7 @@ export const Navbar = ({ loginclick, signupclick }) => {
   // const [theme, toggleTheme] = useDarkMode();
   // console.log(theme);
   // const themeMode = theme === "light" ? lightTheme : darkTheme;
-  const theme = "dasrk";
+  const theme = "darsk";
   return (
     <div className={theme === "dark" ? "dark" : ""}>
       <nav className="nav flex flex-wrap items-center justify-between px-4 border-b dark:bg-custom-grey">
@@ -55,7 +64,46 @@ export const Navbar = ({ loginclick, signupclick }) => {
 
           <li className="border-t md:border-none navbarItem">
             <button className="block md:inline-block px-1 py-3 no-underline text-grey-darkest hover:text-grey-darker rl ease-in-out dark:text-white dark:after:bg-white">
-              Author
+              <Text>
+                <HoverCard.Root>
+                  <HoverCard.Trigger>Author</HoverCard.Trigger>
+                  <HoverCard.Content className="HoverCardContent">
+                    <div className="flex flex-col items-start justify-between">
+                      <Heading size="3" as="h3">
+                        Cherish
+                      </Heading>
+                      <div className="flex justify-start items-center">
+                        <IoMdMail size={20} className="mr-4" />
+                        <a
+                          href="mailto:saicherish90@gmail.com "
+                          target="_blank"
+                        >
+                          Mail
+                        </a>
+                      </div>
+                      <div className="flex justify-center items-center">
+                        <FaXTwitter size={20} className="mr-3" />
+                        <a
+                          href="https://twitter.com/Cherishhere"
+                          target="_blank"
+                        >
+                          Twitter
+                        </a>
+                      </div>
+                      <div className="flex justify-around  items-center">
+                        <FaLinkedin className="mr-2" />
+
+                        <a
+                          target="_blank"
+                          href="https://www.linkedin.com/in/siva-sai-cherish-94688b236/"
+                        >
+                          Linkedin
+                        </a>
+                      </div>
+                    </div>
+                  </HoverCard.Content>
+                </HoverCard.Root>
+              </Text>
             </button>
           </li>
         </ul>

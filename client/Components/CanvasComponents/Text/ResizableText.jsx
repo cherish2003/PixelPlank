@@ -1,5 +1,7 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useContext } from "react";
 import { Text, Transformer } from "react-konva";
+import { UserContext } from "../../../Context/UserProvider";
+import { SocketContext } from "../../../Context/SocketProvider";
 
 export function ResizableText({
   colour,
@@ -11,7 +13,6 @@ export function ResizableText({
   onResize,
   onClick,
   onDoubleClick,
-  setShapeState,
   fontSize,
   lines,
   line,
@@ -19,20 +20,24 @@ export function ResizableText({
 }) {
   const textRef = useRef(null);
   const transformerRef = useRef(null);
+  const { user } = useContext(UserContext);
+  const { socket } = useContext(SocketContext);
 
   // Function to handle drag end
   const handleDragEnd = () => {
     if (line) {
-      const updatedLines = lines.map((l) =>
-        l.id === line.id
-          ? {
-              ...l,
-              points: { x: textRef.current.x(), y: textRef.current.y() },
-            }
-          : l
+      setLines((prevLines) =>
+        prevLines.map((l) =>
+          l.id === line.id ? { ...l, position: updatedPosition } : l
+        )
       );
-      setLines(updatedLines);
-      setPosition({ x: textRef.current.x(), y: textRef.current.y() });
+      const updatedPosition = {
+        x: textRef.current.x(),
+        y: textRef.current.y(),
+      };
+
+      setPosition(updatedPosition);
+      socket.emit("textMoved", user._id, updatedPosition);
     }
   };
 

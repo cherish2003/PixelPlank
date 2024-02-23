@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Group, Rect } from "react-konva";
 import { EditableTextInput } from "./EditableTextInput";
 import { ResizableText } from "./ResizableText";
+import { UserContext } from "../../../Context/UserProvider";
+import { SocketContext } from "../../../Context/SocketProvider";
 
 export function TextBox({
   colour,
@@ -21,8 +23,11 @@ export function TextBox({
   setLines,
   fontSize,
 }) {
+  
   const RETURN_KEY = 13;
   const ESCAPE_KEY = 27;
+  const { user } = useContext(UserContext);
+  const { socket } = useContext(SocketContext);
 
   const [isEditing, setIsEditing] = useState(false);
   const [isTransforming, setIsTransforming] = useState(false);
@@ -54,7 +59,10 @@ export function TextBox({
   }
 
   function handleTextChange(e) {
-    onTextChange(e.currentTarget.value);
+    const newText = e.currentTarget.value;
+    onTextChange(newText);
+    console.log(newText);
+    socket.emit("textChanged", user._id, newText);
   }
 
   return isEditing ? (
@@ -88,28 +96,8 @@ export function TextBox({
         line={line}
         fontSize={fontSize}
         setLines={setLines}
+        socket={socket}
       />
     </Group>
   );
 }
-
-{
-  /* <EditableText
-      x={0}
-      y={0}
-      text={text}
-      width={width}
-      height={height}
-      onResize={onTextResize}
-      isEditing={isEditing}
-      isTransforming={isTransforming}
-      onToggleEdit={toggleEdit}
-      onToggleTransform={toggleTransforming}
-      onChange={onTextChange}
-      setShapeState={setShapeState}
-      lines={lines}
-      line={line}
-      setLines={setLines}
-    /> */
-}
-// </Group>
