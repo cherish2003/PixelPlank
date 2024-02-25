@@ -14,7 +14,8 @@ Pixel Plank is a collaborative whiteboard application designed for real-time dra
 4. **Authentication**: Supports user authentication with JWT (JSON Web Tokens), providing secure access to the application.
 5. **User Management**: Includes features for user registration, login, and real-time validation for seamless user experience.
 
-
+## Anonymous Mode
+Navigate to localhost:5173/* any route will redirect you to Anonymous Mode where can join other room can view  ongoing activities
 ## UI 
 ### Login Page:
 <img width="1440" alt="Screenshot 2024-02-24 at 1 46 52 AM" src="https://github.com/cherish2003/PixelPlank/assets/88829894/0b8395c7-2aea-48b1-9164-084b2dc7c3ec">
