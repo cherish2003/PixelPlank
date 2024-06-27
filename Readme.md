@@ -18,6 +18,11 @@ Pixel Plank is a collaborative whiteboard application designed for real-time dra
 Navigate to ```
  localhost:5173/* ```
  any route will redirect you to Anonymous Mode where can join other room can view  ongoing activities
+## DEMO 
+https://github.com/cherish2003/PixelPlank/assets/88829894/301224a3-c075-4dc6-90b2-598424b5f01f
+
+
+
 ## UI 
 ### Login Page:
 <img width="1440" alt="Screenshot 2024-02-24 at 1 46 52 AM" src="https://github.com/cherish2003/PixelPlank/assets/88829894/0b8395c7-2aea-48b1-9164-084b2dc7c3ec">
