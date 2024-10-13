@@ -3,7 +3,7 @@ import { io } from "socket.io-client";
 
 export const SocketContext = createContext();
 
-const socket = io("http://localhost:4500");
+const socket = io(`${import.meta.env.VITE_API_URL}`);
 
 export const SocketProvider = ({ children }) => {
   return (

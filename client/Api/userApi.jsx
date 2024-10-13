@@ -2,17 +2,17 @@ import axios from "axios";
 
 axios.defaults.withCredentials = true;
 export const loginApi = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL}/user/login`,
+  baseURL: `${import.meta.env.VITE_API_URL}/api/user/login`,
 });
 export const registerApi = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL}/user/signup`,
+  baseURL: `${import.meta.env.VITE_API_URL}/api/user/signup`,
 });
 export const tokenApi = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL}/user/refresh`,
+  baseURL: `${import.meta.env.VITE_API_URL}/api/user/refresh`,
 });
 export const getUserdata = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL}/user/getdata`,
+  baseURL: `${import.meta.env.VITE_API_URL}/api/user/getdata`,
 });
 export const validateToken = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL}/user/verifyId`,
+  baseURL: `${import.meta.env.VITE_API_URL}/api/user/verifyId`,
 });
