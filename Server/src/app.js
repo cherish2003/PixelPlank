@@ -17,10 +17,14 @@ dotenv.config({
 const app = express();
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: [
+      "http://localhost:5173",
+      "https://jovial-cuchufli-baed13.netlify.app",
+    ],
     credentials: true, // Allow credentials
   })
 );
+
 
 const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
