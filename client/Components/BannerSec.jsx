@@ -14,7 +14,6 @@ import { ResponseToast } from "./ResponseToast";
 import { UserContext } from "../Context/UserProvider";
 import { getUserdata } from "../Api/userApi";
 
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 export const BannerSec = forwardRef((props, ref) => {

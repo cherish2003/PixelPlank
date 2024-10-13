@@ -290,8 +290,8 @@ $main_black: #212121;
 .ToolbarButton {
   padding-left: 10px;
   padding-right: 10px;
-  color:$dark-color;
-  background-color: $dark-color;
+  color: $dark-color;
+  transition: all 0.3s ease-in-out;
 }
 .ToolbarButton:hover {
   background-color: $dark-color;

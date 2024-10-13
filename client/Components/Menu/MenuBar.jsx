@@ -62,7 +62,7 @@ export const MenuBar = ({
 
   return (
     <Toolbar.Root className="ToolbarRoot" aria-label="Formatting options">
-      <Toolbar.Button className="ToolbarButton" onClick={undo}>
+      <Toolbar.Button className="ToolbarButton" onClick={undo} >
         <IoIosUndo size={20} />
       </Toolbar.Button>
       <Toolbar.Button className="ToolbarButton" onClick={redo}>

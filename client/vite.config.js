@@ -1,11 +1,11 @@
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react-swc";
-import EnvironmentPlugin from "vite-plugin-environment";
-
+import { env } from "process";
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [EnvironmentPlugin("all"), react()],
+  plugins: [react()],
   define: {
-    global: {},
+    global: "globalThis",
+    "process.env": env,
   },
 });
